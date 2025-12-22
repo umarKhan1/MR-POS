@@ -48,6 +48,41 @@ class AppStrings {
   static const String networkError =
       'Network error. Please check your connection.';
   static const String unknownError = 'An unknown error occurred.';
+
+  // Dashboard
+  static const String dashboard = 'Dashboard';
+  static const String menu = 'Menu';
+  static const String staff = 'Staff';
+  static const String inventory = 'Inventory';
+  static const String reports = 'Reports';
+  static const String orderTable = 'Order/Table';
+  static const String reservation = 'Reservation';
+  static const String logout = 'Logout';
+
+  // Stats
+  static const String dailySales = 'Daily Sales';
+  static const String monthlyRevenue = 'Monthly Revenue';
+  static const String tableOccupancy = 'Table Occupancy';
+  static const String tables = 'Tables';
+
+  // Popular Dishes
+  static const String popularDishes = 'Popular Dishes';
+  static const String mostFamous = 'Most Famous';
+  static const String seeAll = 'See All';
+  static const String serving = 'Serving';
+  static const String order = 'Order';
+  static const String person = 'person';
+  static const String inStock = 'In Stock';
+  static const String outOfStock = 'Out of Stock';
+
+  // Overview
+  static const String overview = 'Overview';
+  static const String sales = 'Sales';
+  static const String revenue = 'Revenue';
+  static const String monthly = 'Monthly';
+  static const String daily = 'Daily';
+  static const String weekly = 'Weekly';
+  static const String export = 'Export';
 }
 
 class AppAssets {
@@ -55,4 +90,5 @@ class AppAssets {
 
   // Images
   static const String logo = 'assets/images/logo.png';
+  static const String dashboardImage = 'assets/images/dasboardsimage.png';
 }

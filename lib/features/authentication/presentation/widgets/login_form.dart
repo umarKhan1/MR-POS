@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
+import 'package:mrpos/core/router/route_names.dart';
 import 'package:mrpos/features/authentication/presentation/bloc/auth_cubit.dart';
 import 'package:mrpos/features/authentication/presentation/bloc/auth_state.dart';
 import 'package:mrpos/shared/widgets/custom_button.dart';
 import 'package:mrpos/shared/widgets/custom_text_field.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -43,6 +45,7 @@ class _LoginFormState extends State<LoginForm> {
           context.showSnackBar(state.message, isError: true);
         } else if (state is AuthAuthenticated) {
           context.showSnackBar(AppStrings.loginSuccess);
+          context.go(RouteNames.dashboard);
         }
       },
       builder: (context, state) {

@@ -73,6 +73,10 @@ dependencies:
   intl: ^0.19.0
   uuid: ^4.5.1
   logger: ^2.5.0
+  
+  # Icons & Charts
+  font_awesome_flutter: ^10.7.0
+  fl_chart: ^0.69.2
 
 dev_dependencies:
   flutter_test:
