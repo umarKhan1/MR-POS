@@ -34,4 +34,22 @@ class AppColors {
   // Decorative Circle Colors (for login background)
   static const Color circleBlue = Color(0xFF2196F3);
   static const Color circleWhite = Colors.white;
+
+  // Shadow Colors
+  static const Color shadowLight = Color(0x1A000000);
+  static const Color shadowDark = Color(0x33000000);
+
+  // Hover State Colors
+  static const Color hoverLight = Color(0xFFF0F0F0);
+  static const Color hoverDark = Color(0xFF3A3A3A);
+
+  // Shimmer/Skeleton Colors
+  static const Color shimmerBaseLight = Color(0xFFE0E0E0);
+  static const Color shimmerHighlightLight = Color(0xFFF5F5F5);
+  static const Color shimmerBaseDark = Color(0xFF2A2A2A);
+  static const Color shimmerHighlightDark = Color(0xFF3A3A3A);
+
+  // Gradient Colors
+  static const Color gradientStart = Color(0xFFE31E24);
+  static const Color gradientEnd = Color(0xFFFF5252);
 }

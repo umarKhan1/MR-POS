@@ -7,14 +7,10 @@ import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:go_router/go_router.dart';
 
 class SidebarNav extends StatefulWidget {
-  final String currentRoute;
+  final String? currentRoute;
   final bool isDrawer;
 
-  const SidebarNav({
-    super.key,
-    required this.currentRoute,
-    this.isDrawer = false,
-  });
+  const SidebarNav({super.key, this.currentRoute, this.isDrawer = false});
 
   @override
   State<SidebarNav> createState() => _SidebarNavState();
@@ -44,18 +40,13 @@ class _SidebarNavState extends State<SidebarNav> {
                   ),
                   _buildNavItem(
                     icon: FontAwesomeIcons.utensils,
-                    label: AppStrings.menu,
+                    label: AppStrings.menuNav,
                     route: RouteNames.menu,
                   ),
                   _buildNavItem(
                     icon: FontAwesomeIcons.userGroup,
                     label: AppStrings.staff,
                     route: RouteNames.staff,
-                  ),
-                  _buildNavItem(
-                    icon: FontAwesomeIcons.boxesStacked,
-                    label: AppStrings.inventory,
-                    route: RouteNames.inventory,
                   ),
                   _buildNavItem(
                     icon: FontAwesomeIcons.chartLine,

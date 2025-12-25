@@ -30,35 +30,28 @@ class DashboardScreen extends StatelessWidget {
               ),
             )
           : null,
-      body: Row(
-        children: [
-          if (!isMobile) const SidebarNav(currentRoute: RouteNames.dashboard),
-          Expanded(
-            child: Container(
-              color: context.theme.scaffoldBackgroundColor,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DashboardHeader(
-                      onMenuTap: isMobile
-                          ? () => scaffoldKey.currentState?.openDrawer()
-                          : null,
-                    ),
-                    24.h,
-                    const StatsSection(),
-                    24.h,
-                    _buildPopularDishesSection(isDesktop, isTablet),
-                    24.h,
-                    const OverviewChart(),
-                    24.h,
-                  ],
-                ),
+      body: Container(
+        color: context.theme.scaffoldBackgroundColor,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(isDesktop ? 32 : (isTablet ? 24 : 16)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DashboardHeader(
+                onMenuTap: isMobile
+                    ? () => scaffoldKey.currentState?.openDrawer()
+                    : null,
               ),
-            ),
+              24.h,
+              const StatsSection(),
+              24.h,
+              _buildPopularDishesSection(isDesktop, isTablet),
+              24.h,
+              const OverviewChart(),
+              24.h,
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

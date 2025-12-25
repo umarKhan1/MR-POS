@@ -51,7 +51,7 @@ class AppStrings {
 
   // Dashboard
   static const String dashboard = 'Dashboard';
-  static const String menu = 'Menu';
+  static const String menuNav = 'Menu';
   static const String staff = 'Staff';
   static const String inventory = 'Inventory';
   static const String reports = 'Reports';
@@ -83,6 +83,28 @@ class AppStrings {
   static const String daily = 'Daily';
   static const String weekly = 'Weekly';
   static const String export = 'Export';
+
+  // Menu
+  static const String menu = 'Menu';
+  static const String categories = 'Categories';
+  static const String addNewCategory = 'Add New Category';
+  static const String addMenuItem = 'Add Menu Item';
+  static const String specialMenuAllItems = 'Special menu all items';
+  static const String normalMenu = 'Normal Menu';
+  static const String specialDeals = 'Special Deals';
+  static const String newYearSpecial = 'New Year Special';
+  static const String desertsAndDrinks = 'Deserts and Drinks';
+  static const String product = 'Product';
+  static const String productName = 'Product Name';
+  static const String itemID = 'Item ID';
+  static const String itemId = 'Item ID'; // Alternative naming
+  static const String stock = 'Stock';
+  static const String category = 'Category';
+  static const String price = 'Price';
+  static const String availability = 'Availability';
+  static const String description = 'Description';
+  static const String all = 'All';
+  static const String items = 'items';
 }
 
 class AppAssets {
@@ -91,4 +113,11 @@ class AppAssets {
   // Images
   static const String logo = 'assets/images/logo.png';
   static const String dashboardImage = 'assets/images/dasboardsimage.png';
+
+  // Category Icons
+  static const String category = 'assets/Images/category.png';
+  static const String pizzaIcon = 'assets/Images/pizza.png';
+  static const String burgerIcon = 'assets/Images/fast-food 1.png';
+  static const String chickenIcon = 'assets/Images/chicken.png';
+  static const String seafoodIcon = 'assets/Images/seafood.png';
 }

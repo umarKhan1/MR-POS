@@ -8,6 +8,7 @@ class RouteNames {
   static const String inventory = '/inventory';
   static const String reports = '/reports';
   static const String orderTable = '/order-table';
+  static const String createOrder = '/create-order';
   static const String reservation = '/reservation';
   static const String settings = '/settings';
 }

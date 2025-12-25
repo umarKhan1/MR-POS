@@ -1,5 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:mrpos/shared/theme/app_colors.dart';
 
+/// A reusable button widget with consistent styling across the app.
+///
+/// **Usage:**
+/// ```dart
+/// // Primary button with red background (recommended for main actions)
+/// CustomButton.primary(
+///   text: 'Add Item',
+///   onPressed: () {},
+/// )
+///
+/// // Outlined button with red border
+/// CustomButton.outlined(
+///   text: 'Cancel',
+///   onPressed: () {},
+/// )
+///
+/// // Custom button with specific colors
+/// CustomButton(
+///   text: 'Custom',
+///   onPressed: () {},
+///   backgroundColor: Colors.blue,
+///   textColor: Colors.white,
+/// )
+/// ```
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -27,6 +52,36 @@ class CustomButton extends StatelessWidget {
     this.borderRadius = 12,
     this.padding,
   });
+
+  /// Primary button with red background and white text
+  const CustomButton.primary({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+    this.width,
+    this.height,
+    this.icon,
+    this.borderRadius = 8,
+    this.padding,
+  }) : isOutlined = false,
+       backgroundColor = AppColors.primaryRed,
+       textColor = Colors.white;
+
+  /// Outlined button with red border and red text
+  const CustomButton.outlined({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+    this.width,
+    this.height,
+    this.icon,
+    this.borderRadius = 8,
+    this.padding,
+  }) : isOutlined = true,
+       backgroundColor = AppColors.primaryRed,
+       textColor = AppColors.primaryRed;
 
   @override
   Widget build(BuildContext context) {

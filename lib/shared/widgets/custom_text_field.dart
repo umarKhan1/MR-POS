@@ -43,6 +43,7 @@ class CustomTextField extends StatefulWidget {
     this.onSubmitted,
     this.readOnly = false,
     this.onTap,
+    required String label,
   });
 
   @override

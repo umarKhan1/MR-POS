@@ -73,6 +73,7 @@ class _LoginFormState extends State<LoginForm> {
   Widget _buildEmailField() {
     return CustomTextField(
       controller: _emailController,
+      label: '',
       hintText: AppStrings.emailHint,
       prefixIcon: Icons.email_outlined,
       keyboardType: TextInputType.emailAddress,
@@ -91,6 +92,7 @@ class _LoginFormState extends State<LoginForm> {
 
   Widget _buildPasswordField() {
     return CustomTextField(
+      label: '',
       controller: _passwordController,
       hintText: AppStrings.passwordHint,
       prefixIcon: Icons.lock_outline,
