@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mrpos/core/models/reservation.dart';
 import 'package:mrpos/core/router/route_names.dart';
 import 'package:mrpos/features/authentication/presentation/screens/login_screen.dart';
 import 'package:mrpos/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:mrpos/features/menu/presentation/screens/menu_screen.dart';
 import 'package:mrpos/features/orders/presentation/screens/orders_screen.dart';
 import 'package:mrpos/features/orders/presentation/screens/create_order_screen.dart';
+import 'package:mrpos/features/reservations/presentation/screens/reservations_screen.dart';
+import 'package:mrpos/features/reservations/presentation/screens/reservation_details_screen.dart';
 import 'package:mrpos/shared/layouts/main_layout.dart';
 
 class AppRouter {
@@ -42,6 +45,11 @@ class AppRouter {
             name: RouteNames.orderTable,
             builder: (context, state) => const OrdersScreen(),
           ),
+          GoRoute(
+            path: RouteNames.reservation,
+            name: RouteNames.reservation,
+            builder: (context, state) => const ReservationsScreen(),
+          ),
         ],
       ),
 
@@ -52,6 +60,16 @@ class AppRouter {
         builder: (context, state) {
           final orderId = state.uri.queryParameters['orderId'];
           return CreateOrderScreen(orderId: orderId);
+        },
+      ),
+
+      // Reservation Details route (full screen, no sidebar)
+      GoRoute(
+        path: '/reservation-details',
+        name: 'reservation-details',
+        builder: (context, state) {
+          final reservation = state.extra as Reservation;
+          return ReservationDetailsScreen(reservation: reservation);
         },
       ),
     ],
