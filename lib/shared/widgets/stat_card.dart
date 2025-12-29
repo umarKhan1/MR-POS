@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -24,9 +25,10 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final responsive = ResponsiveUtils(context);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(responsive.cardPadding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -44,18 +46,24 @@ class StatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                    fontSize: responsive.responsive(
+                      mobile: 13.0,
+                      tablet: 14.0,
+                      desktop: 14.0,
+                    ),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(responsive.isMobile ? 8 : 10),
                 decoration: BoxDecoration(
                   color: (iconColor ?? AppColors.primaryRed).withValues(
                     alpha: 0.15,
@@ -65,56 +73,88 @@ class StatCard extends StatelessWidget {
                 child: Icon(
                   icon,
                   color: iconColor ?? AppColors.primaryRed,
-                  size: 20,
+                  size: responsive.isMobile ? 18 : 20,
                 ),
               ),
             ],
           ),
-          16.h,
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      value,
-                      style: TextStyle(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimaryLight,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (dateRange != null) ...[
-                      8.h,
-                      Text(
-                        dateRange!,
-                        style: TextStyle(
-                          color: isDark
-                              ? AppColors.textSecondaryDark.withValues(
-                                  alpha: 0.6,
-                                )
-                              : AppColors.textSecondaryLight.withValues(
-                                  alpha: 0.6,
-                                ),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ],
+          responsive.isMobile ? 12.h : 16.h,
+          // Stack chart below value on mobile, side-by-side on larger screens
+          if (responsive.isMobile && chartData != null) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildValueSection(context, isDark, responsive),
+                12.h,
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: _buildMiniChart(),
                 ),
-              ),
-              if (chartData != null) ...[
-                16.w,
-                SizedBox(width: 120, height: 60, child: _buildMiniChart()),
               ],
-            ],
-          ),
+            ),
+          ] else ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _buildValueSection(context, isDark, responsive),
+                ),
+                if (chartData != null) ...[
+                  16.w,
+                  SizedBox(
+                    width: responsive.isTablet ? 100 : 120,
+                    height: 60,
+                    child: _buildMiniChart(),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildValueSection(
+    BuildContext context,
+    bool isDark,
+    ResponsiveUtils responsive,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
+            fontSize: responsive.responsive(
+              mobile: 24.0,
+              tablet: 26.0,
+              desktop: 28.0,
+            ),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        if (dateRange != null) ...[
+          8.h,
+          Text(
+            dateRange!,
+            style: TextStyle(
+              color: isDark
+                  ? AppColors.textSecondaryDark.withValues(alpha: 0.6)
+                  : AppColors.textSecondaryLight.withValues(alpha: 0.6),
+              fontSize: responsive.responsive(
+                mobile: 11.0,
+                tablet: 12.0,
+                desktop: 12.0,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

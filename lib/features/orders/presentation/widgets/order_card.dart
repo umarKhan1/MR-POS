@@ -10,6 +10,7 @@ import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:mrpos/features/orders/presentation/widgets/payment_modal.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;
@@ -19,8 +20,12 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(
+        responsive.responsive(mobile: 10.0, tablet: 12.0, desktop: 14.0),
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
@@ -39,8 +44,16 @@ class OrderCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: responsive.responsive(
+                  mobile: 36.0,
+                  tablet: 40.0,
+                  desktop: 46.0,
+                ),
+                height: responsive.responsive(
+                  mobile: 36.0,
+                  tablet: 40.0,
+                  desktop: 46.0,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryRed,
                   borderRadius: BorderRadius.circular(8),
@@ -48,26 +61,36 @@ class OrderCard extends StatelessWidget {
                 child: Center(
                   child: Text(
                     orderIndex.toString().padLeft(2, '0'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: responsive.responsive(
+                        mobile: 14.0,
+                        tablet: 16.0,
+                        desktop: 18.0,
+                      ),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ),
-              10.w,
+              responsive.responsive(mobile: 6.w, tablet: 8.w, desktop: 10.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       order.customerName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: responsive.responsive(
+                          mobile: 12.0,
+                          tablet: 13.0,
+                          desktop: 14.0,
+                        ),
                         fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Row(
                       children: [
@@ -75,7 +98,11 @@ class OrderCard extends StatelessWidget {
                           'Order ${order.orderNumber}',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
-                            fontSize: 11,
+                            fontSize: responsive.responsive(
+                              mobile: 9.0,
+                              tablet: 10.0,
+                              desktop: 11.0,
+                            ),
                           ),
                         ),
                         6.w,
@@ -92,19 +119,27 @@ class OrderCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _buildStatusBadge(),
+              _buildStatusBadge(responsive),
             ],
           ),
-          8.h,
+          responsive.responsive(mobile: 4.h, tablet: 5.h, desktop: 6.h),
           // Status detail dropdown
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () => _showStatusDetailDialog(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
+                padding: EdgeInsets.symmetric(
+                  horizontal: responsive.responsive(
+                    mobile: 6.0,
+                    tablet: 8.0,
+                    desktop: 10.0,
+                  ),
+                  vertical: responsive.responsive(
+                    mobile: 4.0,
+                    tablet: 4.0,
+                    desktop: 5.0,
+                  ),
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A),
@@ -117,7 +152,11 @@ class OrderCard extends StatelessWidget {
                       order.statusDetail,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
-                        fontSize: 10,
+                        fontSize: responsive.responsive(
+                          mobile: 8.0,
+                          tablet: 9.0,
+                          desktop: 10.0,
+                        ),
                       ),
                     ),
                     4.w,
@@ -131,10 +170,12 @@ class OrderCard extends StatelessWidget {
               ),
             ),
           ),
-          8.h,
+          responsive.responsive(mobile: 4.h, tablet: 5.h, desktop: 6.h),
           // Items table
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(
+              responsive.responsive(mobile: 6.0, tablet: 8.0, desktop: 10.0),
+            ),
             decoration: BoxDecoration(
               color: const Color(0xFF1A1A1A),
               borderRadius: BorderRadius.circular(8),
@@ -145,12 +186,20 @@ class OrderCard extends StatelessWidget {
                 Row(
                   children: [
                     SizedBox(
-                      width: 32,
+                      width: responsive.responsive(
+                        mobile: 24.0,
+                        tablet: 28.0,
+                        desktop: 32.0,
+                      ),
                       child: Text(
                         'Qty',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.4),
-                          fontSize: 10,
+                          fontSize: responsive.responsive(
+                            mobile: 8.0,
+                            tablet: 9.0,
+                            desktop: 10.0,
+                          ),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -160,7 +209,11 @@ class OrderCard extends StatelessWidget {
                         'Items',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.4),
-                          fontSize: 10,
+                          fontSize: responsive.responsive(
+                            mobile: 8.0,
+                            tablet: 9.0,
+                            desktop: 10.0,
+                          ),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -169,35 +222,57 @@ class OrderCard extends StatelessWidget {
                       'Price',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.4),
-                        fontSize: 10,
+                        fontSize: responsive.responsive(
+                          mobile: 8.0,
+                          tablet: 9.0,
+                          desktop: 10.0,
+                        ),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-                4.h,
+                responsive.responsive(mobile: 2.h, tablet: 3.h, desktop: 4.h),
                 // Items
                 ...order.items.map(
                   (item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
+                    padding: EdgeInsets.only(
+                      bottom: responsive.responsive(
+                        mobile: 2.0,
+                        tablet: 3.0,
+                        desktop: 4.0,
+                      ),
+                    ),
                     child: Row(
                       children: [
                         SizedBox(
-                          width: 32,
+                          width: responsive.responsive(
+                            mobile: 24.0,
+                            tablet: 28.0,
+                            desktop: 32.0,
+                          ),
                           child: Text(
                             item.quantity.toString().padLeft(2, '0'),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 11,
+                              fontSize: responsive.responsive(
+                                mobile: 9.0,
+                                tablet: 10.0,
+                                desktop: 11.0,
+                              ),
                             ),
                           ),
                         ),
                         Expanded(
                           child: Text(
                             item.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 11,
+                              fontSize: responsive.responsive(
+                                mobile: 9.0,
+                                tablet: 10.0,
+                                desktop: 11.0,
+                              ),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -205,9 +280,13 @@ class OrderCard extends StatelessWidget {
                         ),
                         Text(
                           '\$${item.price.toStringAsFixed(0)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: responsive.responsive(
+                              mobile: 9.0,
+                              tablet: 10.0,
+                              desktop: 11.0,
+                            ),
                           ),
                         ),
                       ],
@@ -217,30 +296,38 @@ class OrderCard extends StatelessWidget {
               ],
             ),
           ),
-          8.h,
+          responsive.responsive(mobile: 4.h, tablet: 5.h, desktop: 6.h),
           // Subtotal
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'SubTotal',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: responsive.responsive(
+                    mobile: 10.0,
+                    tablet: 11.0,
+                    desktop: 12.0,
+                  ),
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
                 '\$${order.subtotal.toStringAsFixed(0)}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: responsive.responsive(
+                    mobile: 10.0,
+                    tablet: 11.0,
+                    desktop: 12.0,
+                  ),
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          10.h,
+          responsive.responsive(mobile: 6.h, tablet: 7.h, desktop: 8.h),
           // Action buttons - only show for active orders (not completed or cancelled)
           if (order.status != OrderStatus.completed &&
               order.status != OrderStatus.cancelled) ...[
@@ -253,11 +340,13 @@ class OrderCard extends StatelessWidget {
                       context,
                     ).push('/create-order?orderId=${order.id}');
                   },
+                  responsive: responsive,
                 ),
                 8.w,
                 _buildActionButton(
                   icon: FontAwesomeIcons.trash,
                   onPressed: () => _cancelOrder(context),
+                  responsive: responsive,
                 ),
                 const Spacer(),
                 Expanded(
@@ -271,18 +360,28 @@ class OrderCard extends StatelessWidget {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 9),
+                        padding: EdgeInsets.symmetric(
+                          vertical: responsive.responsive(
+                            mobile: 7.0,
+                            tablet: 8.0,
+                            desktop: 9.0,
+                          ),
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primaryRed,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Pay Bill',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
-                              fontSize: 12,
+                              fontSize: responsive.responsive(
+                                mobile: 10.0,
+                                tablet: 11.0,
+                                desktop: 12.0,
+                              ),
                             ),
                           ),
                         ),
@@ -298,9 +397,12 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(ResponsiveUtils responsive) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.isMobile ? 8 : 10,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
         color: _getStatusColor().withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
@@ -312,13 +414,17 @@ class OrderCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(_getStatusIcon(), color: _getStatusColor(), size: 11),
-          5.w,
+          Icon(
+            _getStatusIcon(),
+            color: _getStatusColor(),
+            size: responsive.isMobile ? 10 : 11,
+          ),
+          responsive.isMobile ? 4.w : 5.w,
           Text(
             order.status.displayName,
             style: TextStyle(
               color: _getStatusColor(),
-              fontSize: 11,
+              fontSize: responsive.isMobile ? 10 : 11,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -330,14 +436,15 @@ class OrderCard extends StatelessWidget {
   Widget _buildActionButton({
     required IconData icon,
     required VoidCallback onPressed,
+    required ResponsiveUtils responsive,
   }) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
-          width: 40,
-          height: 40,
+          width: responsive.isMobile ? 36 : 40,
+          height: responsive.isMobile ? 36 : 40,
           decoration: BoxDecoration(
             color: const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(8),
@@ -346,7 +453,7 @@ class OrderCard extends StatelessWidget {
           child: Center(
             child: FaIcon(
               icon,
-              size: 14,
+              size: responsive.isMobile ? 12 : 14,
               color: Colors.white.withValues(alpha: 0.6),
             ),
           ),

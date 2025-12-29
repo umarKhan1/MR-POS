@@ -4,6 +4,7 @@ import 'package:mrpos/core/constants/mock_data.dart';
 import 'package:mrpos/features/dashboard/presentation/widgets/dish_item.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 class PopularDishesCard extends StatelessWidget {
   final String title;
@@ -18,9 +19,10 @@ class PopularDishesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final responsive = ResponsiveUtils(context);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(responsive.cardPadding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F8F8),
         borderRadius: BorderRadius.circular(16),
@@ -31,14 +33,20 @@ class PopularDishesCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimaryLight,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                    fontSize: responsive.responsive(
+                      mobile: 16.0,
+                      tablet: 18.0,
+                      desktop: 18.0,
+                    ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               TextButton(
@@ -51,13 +59,17 @@ class PopularDishesCard extends StatelessWidget {
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondaryLight,
-                    fontSize: 14,
+                    fontSize: responsive.responsive(
+                      mobile: 13.0,
+                      tablet: 14.0,
+                      desktop: 14.0,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          16.h,
+          responsive.isMobile ? 12.h : 16.h,
           ...dishes.map((dish) => DishItem(dish: dish)),
         ],
       ),

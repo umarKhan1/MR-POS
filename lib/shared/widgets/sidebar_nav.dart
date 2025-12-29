@@ -118,6 +118,11 @@ class _SidebarNavState extends State<SidebarNav> {
           } else {
             context.go(route);
           }
+
+          // Close drawer on mobile after navigation
+          if (widget.isDrawer) {
+            Navigator.of(context).pop();
+          }
         },
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

@@ -5,6 +5,7 @@ import 'package:mrpos/core/constants/app_constants.dart';
 import 'package:mrpos/core/constants/mock_data.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 enum TimeFilter { monthly, daily, weekly }
 
@@ -21,9 +22,10 @@ class _OverviewChartState extends State<OverviewChart> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final responsive = ResponsiveUtils(context);
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(responsive.cardPadding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -38,17 +40,24 @@ class _OverviewChartState extends State<OverviewChart> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(isDark),
-          24.h,
-          _buildLegend(isDark),
-          24.h,
-          SizedBox(height: 300, child: _buildChart(isDark)),
+          _buildHeader(isDark, responsive),
+          responsive.isMobile ? 16.h : 24.h,
+          _buildLegend(isDark, responsive),
+          responsive.isMobile ? 16.h : 24.h,
+          SizedBox(
+            height: responsive.responsive(
+              mobile: 200.0,
+              tablet: 250.0,
+              desktop: 300.0,
+            ),
+            child: _buildChart(isDark, responsive),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(bool isDark, ResponsiveUtils responsive) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -58,21 +67,43 @@ class _OverviewChartState extends State<OverviewChart> {
             color: isDark
                 ? AppColors.textPrimaryDark
                 : AppColors.textPrimaryLight,
-            fontSize: 20,
+            fontSize: responsive.responsive(
+              mobile: 18.0,
+              tablet: 20.0,
+              desktop: 20.0,
+            ),
             fontWeight: FontWeight.bold,
           ),
         ),
-        16.h,
+        responsive.isMobile ? 12.h : 16.h,
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            _buildFilterButton(TimeFilter.monthly, AppStrings.monthly, isDark),
-            _buildFilterButton(TimeFilter.daily, AppStrings.daily, isDark),
-            _buildFilterButton(TimeFilter.weekly, AppStrings.weekly, isDark),
+            _buildFilterButton(
+              TimeFilter.monthly,
+              AppStrings.monthly,
+              isDark,
+              responsive,
+            ),
+            _buildFilterButton(
+              TimeFilter.daily,
+              AppStrings.daily,
+              isDark,
+              responsive,
+            ),
+            _buildFilterButton(
+              TimeFilter.weekly,
+              AppStrings.weekly,
+              isDark,
+              responsive,
+            ),
             OutlinedButton.icon(
               onPressed: () {},
-              icon: const FaIcon(FontAwesomeIcons.download, size: 14),
+              icon: FaIcon(
+                FontAwesomeIcons.download,
+                size: responsive.isMobile ? 12 : 14,
+              ),
               label: Text(AppStrings.export),
               style: OutlinedButton.styleFrom(
                 foregroundColor: isDark
@@ -81,9 +112,9 @@ class _OverviewChartState extends State<OverviewChart> {
                 side: BorderSide(
                   color: isDark ? AppColors.greyDark : AppColors.greyLight,
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                padding: EdgeInsets.symmetric(
+                  horizontal: responsive.isMobile ? 12 : 16,
+                  vertical: responsive.isMobile ? 10 : 12,
                 ),
               ),
             ),
@@ -93,13 +124,21 @@ class _OverviewChartState extends State<OverviewChart> {
     );
   }
 
-  Widget _buildFilterButton(TimeFilter filter, String label, bool isDark) {
+  Widget _buildFilterButton(
+    TimeFilter filter,
+    String label,
+    bool isDark,
+    ResponsiveUtils responsive,
+  ) {
     final isSelected = selectedFilter == filter;
 
     return GestureDetector(
       onTap: () => setState(() => selectedFilter = filter),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.isMobile ? 12 : 16,
+          vertical: responsive.isMobile ? 6 : 8,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryRed : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -112,7 +151,11 @@ class _OverviewChartState extends State<OverviewChart> {
                 : isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondaryLight,
-            fontSize: 14,
+            fontSize: responsive.responsive(
+              mobile: 13.0,
+              tablet: 14.0,
+              desktop: 14.0,
+            ),
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -120,22 +163,37 @@ class _OverviewChartState extends State<OverviewChart> {
     );
   }
 
-  Widget _buildLegend(bool isDark) {
+  Widget _buildLegend(bool isDark, ResponsiveUtils responsive) {
     return Row(
       children: [
-        _buildLegendItem(AppStrings.sales, AppColors.primaryRed, isDark),
-        24.w,
-        _buildLegendItem(AppStrings.revenue, AppColors.grey, isDark),
+        _buildLegendItem(
+          AppStrings.sales,
+          AppColors.primaryRed,
+          isDark,
+          responsive,
+        ),
+        responsive.isMobile ? 16.w : 24.w,
+        _buildLegendItem(
+          AppStrings.revenue,
+          AppColors.grey,
+          isDark,
+          responsive,
+        ),
       ],
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, bool isDark) {
+  Widget _buildLegendItem(
+    String label,
+    Color color,
+    bool isDark,
+    ResponsiveUtils responsive,
+  ) {
     return Row(
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: responsive.isMobile ? 10 : 12,
+          height: responsive.isMobile ? 10 : 12,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         8.w,
@@ -145,14 +203,18 @@ class _OverviewChartState extends State<OverviewChart> {
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondaryLight,
-            fontSize: 14,
+            fontSize: responsive.responsive(
+              mobile: 13.0,
+              tablet: 14.0,
+              desktop: 14.0,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChart(bool isDark) {
+  Widget _buildChart(bool isDark, ResponsiveUtils responsive) {
     return LineChart(
       LineChartData(
         gridData: FlGridData(
@@ -179,7 +241,7 @@ class _OverviewChartState extends State<OverviewChart> {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 30,
+              reservedSize: responsive.isMobile ? 25 : 30,
               interval: 1,
               getTitlesWidget: (value, meta) {
                 if (value.toInt() >= 0 &&
@@ -192,7 +254,11 @@ class _OverviewChartState extends State<OverviewChart> {
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondaryLight,
-                        fontSize: 12,
+                        fontSize: responsive.responsive(
+                          mobile: 10.0,
+                          tablet: 12.0,
+                          desktop: 12.0,
+                        ),
                       ),
                     ),
                   );
@@ -205,7 +271,7 @@ class _OverviewChartState extends State<OverviewChart> {
             sideTitles: SideTitles(
               showTitles: true,
               interval: 1000,
-              reservedSize: 42,
+              reservedSize: responsive.isMobile ? 35 : 42,
               getTitlesWidget: (value, meta) {
                 return Text(
                   '${(value / 1000).toInt()}k',
@@ -213,7 +279,11 @@ class _OverviewChartState extends State<OverviewChart> {
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondaryLight,
-                    fontSize: 12,
+                    fontSize: responsive.responsive(
+                      mobile: 10.0,
+                      tablet: 12.0,
+                      desktop: 12.0,
+                    ),
                   ),
                 );
               },

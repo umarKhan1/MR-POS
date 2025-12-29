@@ -5,12 +5,15 @@ import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_state.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 class OrderFilterTabs extends StatelessWidget {
   const OrderFilterTabs({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+
     return BlocBuilder<OrdersCubit, OrdersState>(
       builder: (context, state) {
         final cubit = context.read<OrdersCubit>();
@@ -28,27 +31,31 @@ class OrderFilterTabs extends StatelessWidget {
                 count: counts?.totalOrders ?? 0,
                 isSelected: selectedFilter == null,
                 onTap: () => cubit.filterOrders(null),
+                responsive: responsive,
               ),
-              12.w,
+              responsive.isMobile ? 8.w : 12.w,
               _buildTab(
                 label: 'In Process',
                 count: counts?.inProcessCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.inProcess,
                 onTap: () => cubit.filterOrders(OrderStatus.inProcess),
+                responsive: responsive,
               ),
-              12.w,
+              responsive.isMobile ? 8.w : 12.w,
               _buildTab(
                 label: 'Completed',
                 count: counts?.completedCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.completed,
                 onTap: () => cubit.filterOrders(OrderStatus.completed),
+                responsive: responsive,
               ),
-              12.w,
+              responsive.isMobile ? 8.w : 12.w,
               _buildTab(
                 label: 'Cancelled',
                 count: counts?.cancelledCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.cancelled,
                 onTap: () => cubit.filterOrders(OrderStatus.cancelled),
+                responsive: responsive,
               ),
             ],
           ),
@@ -62,13 +69,17 @@ class OrderFilterTabs extends StatelessWidget {
     required int count,
     required bool isSelected,
     required VoidCallback onTap,
+    required ResponsiveUtils responsive,
   }) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: responsive.isMobile ? 14 : 20,
+            vertical: responsive.isMobile ? 8 : 10,
+          ),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primaryRed : const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(8),
@@ -83,14 +94,18 @@ class OrderFilterTabs extends StatelessWidget {
                       ? Colors.white
                       : Colors.white.withOpacity(0.7),
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: responsive.responsive(
+                    mobile: 12.0,
+                    tablet: 13.0,
+                    desktop: 13.0,
+                  ),
                 ),
               ),
               if (count > 0) ...[
-                8.w,
+                responsive.isMobile ? 6.w : 8.w,
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: responsive.isMobile ? 6 : 8,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
@@ -103,7 +118,11 @@ class OrderFilterTabs extends StatelessWidget {
                     count.toString(),
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: responsive.responsive(
+                        mobile: 10.0,
+                        tablet: 11.0,
+                        desktop: 11.0,
+                      ),
                       fontWeight: FontWeight.w600,
                     ),
                   ),

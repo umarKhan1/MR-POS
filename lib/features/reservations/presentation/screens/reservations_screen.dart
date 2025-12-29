@@ -8,6 +8,7 @@ import 'package:mrpos/features/reservations/presentation/widgets/add_reservation
 import 'package:mrpos/features/reservations/presentation/widgets/reservation_card.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/shared/utils/responsive_utils.dart';
 
 class ReservationsScreen extends StatelessWidget {
   const ReservationsScreen({super.key});
@@ -86,26 +87,53 @@ class _ReservationsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      body: Column(
+    final responsive = ResponsiveUtils(context);
+    final isMobile = responsive.isMobile;
+
+    return Material(
+      color: const Color(0xFF1A1A1A),
+      child: Column(
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.responsive(
+                mobile: 16.0,
+                tablet: 20.0,
+                desktop: 24.0,
+              ),
+              vertical: responsive.responsive(
+                mobile: 12.0,
+                tablet: 14.0,
+                desktop: 16.0,
+              ),
+            ),
             decoration: const BoxDecoration(color: Color(0xFF1A1A1A)),
             child: Row(
               children: [
-                const Text(
+                if (isMobile) ...[
+                  Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  ),
+                  8.w,
+                ],
+                Text(
                   'Reservation',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: responsive.responsive(
+                      mobile: 18.0,
+                      tablet: 19.0,
+                      desktop: 20.0,
+                    ),
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
                 const Spacer(),
-                // Date selector - clickable
+                // Date selector
                 BlocBuilder<ReservationsCubit, ReservationsState>(
                   builder: (context, state) {
                     final selectedDate = state is ReservationsInitial
@@ -122,8 +150,12 @@ class _ReservationsContent extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () => _selectDate(context),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.responsive(
+                              mobile: 10.0,
+                              tablet: 14.0,
+                              desktop: 16.0,
+                            ),
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
@@ -138,16 +170,28 @@ class _ReservationsContent extends StatelessWidget {
                                     : DateFormat(
                                         'MMM dd, yyyy',
                                       ).format(selectedDate),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 14,
+                                  fontSize: responsive.responsive(
+                                    mobile: 12.0,
+                                    tablet: 13.0,
+                                    desktop: 14.0,
+                                  ),
                                 ),
                               ),
-                              8.w,
-                              const Icon(
+                              responsive.responsive(
+                                mobile: 4.w,
+                                tablet: 6.w,
+                                desktop: 8.w,
+                              ),
+                              Icon(
                                 Icons.keyboard_arrow_down,
                                 color: Colors.white,
-                                size: 16,
+                                size: responsive.responsive(
+                                  mobile: 14.0,
+                                  tablet: 15.0,
+                                  desktop: 16.0,
+                                ),
                               ),
                             ],
                           ),
@@ -156,64 +200,81 @@ class _ReservationsContent extends StatelessWidget {
                     );
                   },
                 ),
-                16.w,
+                responsive.responsive(mobile: 8.w, tablet: 12.w, desktop: 16.w),
                 // Add New Reservation button
                 ElevatedButton(
                   onPressed: () => _showAddReservationModal(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryRed,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.responsive(
+                        mobile: 12.0,
+                        tablet: 16.0,
+                        desktop: 20.0,
+                      ),
+                      vertical: responsive.responsive(
+                        mobile: 10.0,
+                        tablet: 11.0,
+                        desktop: 12.0,
+                      ),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    'Add New Reservation',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                16.w,
-                // Notification icon
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 20,
+                  child: Text(
+                    isMobile ? '+ Add' : 'Add New Reservation',
+                    style: TextStyle(
+                      fontSize: responsive.responsive(
+                        mobile: 12.0,
+                        tablet: 13.0,
+                        desktop: 14.0,
+                      ),
+                      fontWeight: FontWeight.w600,
                     ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
                   ),
                 ),
-                12.w,
-                // Profile icon
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryRed,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 20,
+                if (!isMobile) ...[
+                  16.w,
+                  // Notification icon
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A2A2A),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {},
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
-                ),
+                  12.w,
+                  // Profile icon
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryRed,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {},
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -294,70 +355,88 @@ class _CalendarGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     // Time slots from 10:00 to 20:00 (11 hourly slots)
     final timeSlots = List.generate(11, (index) => 10 + index);
 
+    // Set a minimum width for the calendar grid to ensure readability on small screens
+    const minGridWidth = 1200.0;
+    final gridPadding = responsive.responsive(
+      mobile: 16.0,
+      tablet: 20.0,
+      desktop: 24.0,
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Time header with ranges
-          Row(
+      scrollDirection: Axis.horizontal,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(gridPadding),
+        child: SizedBox(
+          width: minGridWidth,
+          child: Column(
             children: [
-              ...timeSlots.map(
-                (hour) => Expanded(
-                  child: Center(
-                    child: Text(
-                      '${hour.toString().padLeft(2, '0')}:00',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+              // Time header with ranges
+              Row(
+                children: [
+                  ...timeSlots.map(
+                    (hour) => Expanded(
+                      child: Center(
+                        child: Text(
+                          '${hour.toString().padLeft(2, '0')}:00',
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
+                  ),
+                ],
+              ),
+              16.h,
+              // Calendar grid - 8 rows of time slots
+              ...List.generate(
+                8,
+                (rowIndex) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: timeSlots.map((hour) {
+                      // Find reservations for this time slot
+                      final slotReservations = reservations.where((r) {
+                        return r.reservationTime.hour == hour;
+                      }).toList();
+
+                      // Get reservation for this specific row if multiple exist
+                      final reservation = slotReservations.length > rowIndex
+                          ? slotReservations[rowIndex]
+                          : null;
+
+                      return Expanded(
+                        child: Container(
+                          height: 70,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.grey[800]!,
+                              width: 1,
+                            ),
+                          ),
+                          child: reservation != null
+                              ? ReservationCard(reservation: reservation)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
             ],
           ),
-          16.h,
-          // Calendar grid - 8 rows of time slots
-          ...List.generate(
-            8,
-            (rowIndex) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: timeSlots.map((hour) {
-                  // Find reservations for this time slot
-                  final slotReservations = reservations.where((r) {
-                    return r.reservationTime.hour == hour;
-                  }).toList();
-
-                  // Get reservation for this specific row if multiple exist
-                  final reservation = slotReservations.length > rowIndex
-                      ? slotReservations[rowIndex]
-                      : null;
-
-                  return Expanded(
-                    child: Container(
-                      height: 70,
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[800]!, width: 1),
-                      ),
-                      child: reservation != null
-                          ? ReservationCard(reservation: reservation)
-                          : null,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -8,7 +8,9 @@ import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 
 class OrderCartSidebar extends StatefulWidget {
-  const OrderCartSidebar({super.key});
+  final VoidCallback? onClose; // Optional close callback for mobile/tablet
+
+  const OrderCartSidebar({super.key, this.onClose});
 
   @override
   State<OrderCartSidebar> createState() => _OrderCartSidebarState();
@@ -85,10 +87,13 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
                       color: Colors.white,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => GoRouter.of(context).pop(),
-                  ),
+                  // Show close button only if onClose callback is provided (mobile/tablet)
+                  if (widget.onClose != null)
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: widget.onClose,
+                      tooltip: 'Close',
+                    ),
                 ],
               ),
             ),
