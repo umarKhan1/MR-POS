@@ -6,6 +6,7 @@ import 'package:mrpos/features/reservations/presentation/cubit/reservations_cubi
 import 'package:mrpos/features/reservations/presentation/cubit/reservations_state.dart';
 import 'package:mrpos/features/reservations/presentation/widgets/add_reservation_modal.dart';
 import 'package:mrpos/features/reservations/presentation/widgets/reservation_card.dart';
+import 'package:mrpos/features/notifications/presentation/widgets/notification_bell.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
@@ -35,13 +36,16 @@ class _ReservationsContent extends StatelessWidget {
       firstDate: DateTime.now(), // Only allow today and future dates
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
+        final isDark = context.isDarkMode;
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
+          data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primaryRed,
               primary: AppColors.primaryRed,
               onPrimary: Colors.white,
-              surface: Color(0xFF2A2A2A),
-              onSurface: Colors.white,
+              surface: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+              onSurface: isDark ? Colors.white : Colors.black87,
+              brightness: isDark ? Brightness.dark : Brightness.light,
             ),
           ),
           child: child!,
@@ -89,9 +93,12 @@ class _ReservationsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
     final isMobile = responsive.isMobile;
+    final isDark = context.isDarkMode;
 
     return Material(
-      color: const Color(0xFF1A1A1A),
+      color: isDark
+          ? const Color(0xFF1A1A1A)
+          : Theme.of(context).scaffoldBackgroundColor,
       child: Column(
         children: [
           // Header
@@ -108,13 +115,18 @@ class _ReservationsContent extends StatelessWidget {
                 desktop: 16.0,
               ),
             ),
-            decoration: const BoxDecoration(color: Color(0xFF1A1A1A)),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            ),
             child: Row(
               children: [
                 if (isMobile) ...[
                   Builder(
                     builder: (context) => IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.white),
+                      icon: Icon(
+                        Icons.menu,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
                   ),
@@ -129,7 +141,7 @@ class _ReservationsContent extends StatelessWidget {
                       desktop: 20.0,
                     ),
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
                 const Spacer(),
@@ -159,7 +171,9 @@ class _ReservationsContent extends StatelessWidget {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
+                            color: isDark
+                                ? const Color(0xFF2A2A2A)
+                                : Colors.grey[100],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -171,7 +185,7 @@ class _ReservationsContent extends StatelessWidget {
                                         'MMM dd, yyyy',
                                       ).format(selectedDate),
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: isDark ? Colors.white : Colors.black87,
                                   fontSize: responsive.responsive(
                                     mobile: 12.0,
                                     tablet: 13.0,
@@ -186,7 +200,7 @@ class _ReservationsContent extends StatelessWidget {
                               ),
                               Icon(
                                 Icons.keyboard_arrow_down,
-                                color: Colors.white,
+                                color: isDark ? Colors.white : Colors.black54,
                                 size: responsive.responsive(
                                   mobile: 14.0,
                                   tablet: 15.0,
@@ -236,25 +250,7 @@ class _ReservationsContent extends StatelessWidget {
                   ),
                 ),
                 if (!isMobile) ...[
-                  16.w,
-                  // Notification icon
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      onPressed: () {},
-                      padding: EdgeInsets.zero,
-                    ),
-                  ),
+                  const NotificationBell(),
                   12.w,
                   // Profile icon
                   Container(
@@ -319,7 +315,9 @@ class _ReservationsContent extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey[400],
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[700],
                             ),
                           ),
                           8.h,
@@ -327,7 +325,9 @@ class _ReservationsContent extends StatelessWidget {
                             'Click "Add New Reservation" to create one',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: isDark
+                                  ? Colors.grey[600]
+                                  : Colors.grey[400],
                             ),
                           ),
                         ],
@@ -356,6 +356,7 @@ class _CalendarGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final isDark = context.isDarkMode;
     // Time slots from 10:00 to 20:00 (11 hourly slots)
     final timeSlots = List.generate(11, (index) => 10 + index);
 
@@ -418,10 +419,14 @@ class _CalendarGrid extends StatelessWidget {
                           height: 70,
                           margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
+                            color: isDark
+                                ? const Color(0xFF2A2A2A)
+                                : Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: Colors.grey[800]!,
+                              color: (isDark
+                                  ? Colors.grey[800]
+                                  : Colors.grey[200])!,
                               width: 1,
                             ),
                           ),

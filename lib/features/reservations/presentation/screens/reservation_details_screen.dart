@@ -45,32 +45,45 @@ class ReservationDetailsScreen extends StatelessWidget {
   Future<void> _showCancelDialog(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A2A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Cancel Reservation',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-        ),
-        content: const Text(
-          'Are you sure you want to cancel this reservation?',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No', style: TextStyle(color: Colors.grey[400])),
+      builder: (context) {
+        final isDark = context.isDarkMode;
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryRed,
-              foregroundColor: Colors.white,
+          title: Text(
+            'Cancel Reservation',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w700,
             ),
-            child: const Text('Yes, Cancel'),
           ),
-        ],
-      ),
+          content: Text(
+            'Are you sure you want to cancel this reservation?',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryRed,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Yes, Cancel'),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true && context.mounted) {
@@ -85,27 +98,35 @@ class ReservationDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: isDark
+          ? const Color(0xFF1A1A1A)
+          : Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: const BoxDecoration(color: Color(0xFF1A1A1A)),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            ),
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                   onPressed: () => GoRouter.of(context).pop(),
                 ),
                 12.w,
-                const Text(
+                Text(
                   'Reservation Details',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
                 const Spacer(),
@@ -114,13 +135,13 @@ class ReservationDetailsScreen extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
+                    color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.notifications_outlined,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black87,
                       size: 20,
                     ),
                     onPressed: () {},
@@ -165,7 +186,9 @@ class ReservationDetailsScreen extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           AppColors.primaryRed,
-                          AppColors.primaryRed.withOpacity(0.8),
+                          AppColors.primaryRed.withValues(
+                            alpha: isDark ? 0.8 : 0.9,
+                          ),
                         ],
                       ),
                     ),
@@ -220,44 +243,54 @@ class ReservationDetailsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Reservation Details Section
-                        _buildSectionTitle('Reservation Details'),
+                        _buildSectionTitle(context, 'Reservation Details'),
                         16.h,
                         _buildDetailsCard([
                           _buildDetailRow(
+                            context,
                             'Pax Number',
                             '${reservation.numberOfGuests} persons',
                           ),
                           _buildDetailRow(
+                            context,
                             'Reservation Date',
                             DateFormat(
                               'MMM dd, yyyy',
                             ).format(reservation.reservationDate),
                           ),
                           _buildDetailRow(
+                            context,
                             'Reservation Time',
                             reservation.reservationTime.format(context),
                           ),
                           _buildDetailRow(
+                            context,
                             'Status',
                             reservation.status.displayName,
                             statusColor: reservation.status.color,
                           ),
-                        ]),
+                        ], context),
                         32.h,
                         // Customer Details Section
-                        _buildSectionTitle('Customer Details'),
+                        _buildSectionTitle(context, 'Customer Details'),
                         16.h,
                         _buildDetailsCard([
-                          _buildDetailRow('Full Name', reservation.fullName),
                           _buildDetailRow(
+                            context,
+                            'Full Name',
+                            reservation.fullName,
+                          ),
+                          _buildDetailRow(
+                            context,
                             'Phone Number',
                             reservation.phoneNumber,
                           ),
                           _buildDetailRow(
+                            context,
                             'Email Address',
                             reservation.emailAddress,
                           ),
-                        ]),
+                        ], context),
                         32.h,
                         // Action Buttons - Centered
                         Center(
@@ -269,9 +302,13 @@ class ReservationDetailsScreen extends StatelessWidget {
                                   child: OutlinedButton(
                                     onPressed: () => _showCancelDialog(context),
                                     style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
+                                      foregroundColor: isDark
+                                          ? Colors.white
+                                          : Colors.black87,
                                       side: BorderSide(
-                                        color: Colors.grey[700]!,
+                                        color: (isDark
+                                            ? Colors.grey[700]
+                                            : Colors.grey[300])!,
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 16,
@@ -322,35 +359,52 @@ class ReservationDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final isDark = context.isDarkMode;
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: Colors.white,
+        color: isDark ? Colors.white : Colors.black87,
       ),
     );
   }
 
-  Widget _buildDetailsCard(List<Widget> children) {
+  Widget _buildDetailsCard(List<Widget> children, BuildContext context) {
+    final isDark = context.isDarkMode;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: (isDark ? Colors.grey[800] : Colors.grey[200])!,
+        ),
       ),
       child: Column(children: children),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {Color? statusColor}) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value, {
+    Color? statusColor,
+  }) {
+    final isDark = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+              fontSize: 13,
+            ),
+          ),
           statusColor != null
               ? Container(
                   padding: const EdgeInsets.symmetric(
@@ -358,7 +412,7 @@ class ReservationDetailsScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withValues(alpha: isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: statusColor, width: 1),
                   ),
@@ -373,8 +427,8 @@ class ReservationDetailsScreen extends StatelessWidget {
                 )
               : Text(
                   value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),

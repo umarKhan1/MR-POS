@@ -4,6 +4,7 @@ import 'package:mrpos/core/constants/app_constants.dart';
 import 'package:mrpos/core/di/app_providers.dart';
 import 'package:mrpos/core/router/app_router.dart';
 import 'package:mrpos/shared/theme/app_theme.dart';
+import 'package:mrpos/shared/theme/theme_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,13 +17,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: AppProviders.providers,
-      child: MaterialApp.router(
-        title: AppConstants.appName,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.dark,
-        routerConfig: AppRouter.router,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp.router(
+            title: AppConstants.appName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeMode,
+            routerConfig: AppRouter.router,
+          );
+        },
       ),
     );
   }

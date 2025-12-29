@@ -11,6 +11,7 @@ class ReportsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Column(
       children: data.records.asMap().entries.map((entry) {
         final index = entry.key;
@@ -21,41 +22,53 @@ class ReportsTable extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
           decoration: BoxDecoration(
-            color: isEven ? const Color(0xFF262626) : const Color(0xFF1E1E1E),
+            color: isEven
+                ? (isDark ? const Color(0xFF262626) : Colors.grey[100])
+                : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildCell('S.No', record.sNo, width: 70),
-                _buildDivider(),
-                _buildCell('Top Selling Food', record.foodName, width: 220),
-                _buildDivider(),
+                _buildCell(context, 'S.No', record.sNo, width: 70),
+                _buildDivider(isDark),
                 _buildCell(
+                  context,
+                  'Top Selling Food',
+                  record.foodName,
+                  width: 220,
+                ),
+                _buildDivider(isDark),
+                _buildCell(
+                  context,
                   'Revenue By Date',
                   DateFormat('dd. MM. yyyy').format(record.date),
                   width: 180,
                 ),
-                _buildDivider(),
+                _buildDivider(isDark),
                 _buildCell(
+                  context,
                   'Sell Price',
                   '\$${record.sellPrice.toStringAsFixed(2)}',
                   width: 110,
                 ),
-                _buildDivider(),
+                _buildDivider(isDark),
                 _buildCell(
+                  context,
                   'Profit',
                   '\$${record.profit.toStringAsFixed(2)}',
                   width: 110,
                 ),
-                _buildDivider(),
+                _buildDivider(isDark),
                 _buildCell(
+                  context,
                   'Profit Margin',
                   '${record.profitMargin.toStringAsFixed(2)}%',
                   width: 130,
                 ),
-                _buildDivider(),
+                _buildDivider(isDark),
                 _buildCell(
+                  context,
                   'Total Revenue',
                   '\$${record.revenue.toStringAsFixed(2)}',
                   width: 140,
@@ -68,16 +81,22 @@ class ReportsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(bool isDark) {
     return Container(
       height: 44,
       width: 1,
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      color: Colors.white.withValues(alpha: 0.08),
+      color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
     );
   }
 
-  Widget _buildCell(String label, String value, {required double width}) {
+  Widget _buildCell(
+    BuildContext context,
+    String label,
+    String value, {
+    required double width,
+  }) {
+    final isDark = context.isDarkMode;
     return SizedBox(
       width: width,
       child: Column(
@@ -94,8 +113,8 @@ class ReportsTable extends StatelessWidget {
           6.h,
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),

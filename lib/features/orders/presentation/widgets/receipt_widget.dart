@@ -24,8 +24,9 @@ class ReceiptWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 400,
@@ -40,19 +41,23 @@ class ReceiptWidget extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(
+                      color: (isDark ? Colors.white : Colors.black).withValues(
+                        alpha: 0.1,
+                      ),
+                    ),
                   ),
                   child: Column(
                     children: [
                       // POS Name
-                      const Text(
+                      Text(
                         'MR POS',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                           letterSpacing: 2,
                         ),
                       ),
@@ -66,21 +71,20 @@ class ReceiptWidget extends StatelessWidget {
                         'Tel: +1 (555) 123-4567',
                         style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                       ),
-                      16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Receipt title
-                      const Text(
+                      Text(
                         'CASH RECEIPT',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                           letterSpacing: 1,
                         ),
                       ),
                       16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Order details
                       Row(
@@ -88,10 +92,10 @@ class ReceiptWidget extends StatelessWidget {
                         children: [
                           Text(
                             'Order: ${order.orderNumber}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                           Text(
@@ -116,23 +120,23 @@ class ReceiptWidget extends StatelessWidget {
                         ],
                       ),
                       16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Items header
                       Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             flex: 3,
                             child: Text(
                               'Description',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black87,
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 60,
                             child: Text(
                               'Price',
@@ -140,7 +144,7 @@ class ReceiptWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black87,
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
@@ -161,9 +165,11 @@ class ReceiptWidget extends StatelessWidget {
                                   children: [
                                     Text(
                                       item.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.black87,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black87,
                                       ),
                                     ),
                                     Text(
@@ -181,9 +187,11 @@ class ReceiptWidget extends StatelessWidget {
                                 child: Text(
                                   '\$${(item.price * item.quantity).toStringAsFixed(2)}',
                                   textAlign: TextAlign.right,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                               ),
@@ -192,64 +200,68 @@ class ReceiptWidget extends StatelessWidget {
                         ),
                       ),
                       16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Totals
-                      _buildReceiptRow('Subtotal', order.subtotal),
+                      _buildReceiptRow(context, 'Subtotal', order.subtotal),
                       4.h,
-                      _buildReceiptRow('Tax', order.tax),
+                      _buildReceiptRow(context, 'Tax', order.tax),
                       4.h,
-                      _buildReceiptRow('Charges', order.charges),
-                      if (tip > 0) ...[4.h, _buildReceiptRow('Tip', tip)],
+                      _buildReceiptRow(context, 'Charges', order.charges),
+                      if (tip > 0) ...[
+                        4.h,
+                        _buildReceiptRow(context, 'Tip', tip),
+                      ],
                       12.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       12.h,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Total',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                           Text(
                             '\$${(order.total + tip).toStringAsFixed(2)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                         ],
                       ),
                       16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Payment details
                       _buildReceiptRow(
+                        context,
                         'Payment Method',
                         0,
                         value: paymentMethod,
                       ),
                       if (paymentMethod == 'Cash') ...[
                         4.h,
-                        _buildReceiptRow('Cash', received),
+                        _buildReceiptRow(context, 'Cash', received),
                         4.h,
-                        _buildReceiptRow('Change', change),
+                        _buildReceiptRow(context, 'Change', change),
                       ],
                       16.h,
-                      _buildDivider(),
+                      _buildDivider(context),
                       16.h,
                       // Thank you
-                      const Text(
+                      Text(
                         'THANK YOU!',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                           letterSpacing: 2,
                         ),
                       ),
@@ -282,8 +294,14 @@ class ReceiptWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                color: isDark ? AppColors.cardDark : Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: (isDark ? Colors.white : Colors.black).withValues(
+                      alpha: 0.05,
+                    ),
+                  ),
+                ),
               ),
               child: Row(
                 children: [
@@ -293,8 +311,13 @@ class ReceiptWidget extends StatelessWidget {
                       icon: const Icon(Icons.close, size: 18),
                       label: const Text('Close'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey[700],
-                        side: BorderSide(color: Colors.grey[400]!),
+                        foregroundColor: isDark
+                            ? Colors.white
+                            : Colors.grey[700],
+                        side: BorderSide(
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.1),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -395,7 +418,8 @@ class ReceiptWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Row(
       children: List.generate(
         40,
@@ -403,24 +427,38 @@ class ReceiptWidget extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 1),
             height: 1,
-            color: Colors.grey[400],
+            color: (isDark ? Colors.white : Colors.black).withValues(
+              alpha: 0.1,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildReceiptRow(String label, double amount, {String? value}) {
+  Widget _buildReceiptRow(
+    BuildContext context,
+    String label,
+    double amount, {
+    String? value,
+  }) {
+    final isDark = context.isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? Colors.grey[400] : Colors.grey[700],
+          ),
+        ),
         Text(
           value ?? '\$${amount.toStringAsFixed(2)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
       ],

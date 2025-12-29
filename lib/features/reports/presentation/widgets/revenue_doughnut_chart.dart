@@ -12,6 +12,7 @@ class RevenueDoughnutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     final statusLabels = {
       OrderStatus.completed: 'Confirmed',
       OrderStatus.ready: 'Awaited',
@@ -29,16 +30,25 @@ class RevenueDoughnutChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF262626),
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? Colors.black : Colors.grey).withValues(
+              alpha: 0.05,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Total Revenue',
             style: TextStyle(
-              color: Colors.white,
+              color: isDark ? Colors.white : Colors.black,
               fontSize: 22,
               fontWeight: FontWeight.w500,
             ),
@@ -74,10 +84,12 @@ class RevenueDoughnutChart extends StatelessWidget {
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
+                              Text(
                                 'Total',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black54,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -85,7 +97,7 @@ class RevenueDoughnutChart extends StatelessWidget {
                               Text(
                                 '${data.totalRevenue.toInt()}\$',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: isDark ? Colors.white : Colors.black,
                                   fontSize: isSmall ? 24 : 32,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -116,8 +128,8 @@ class RevenueDoughnutChart extends StatelessWidget {
                             12.w,
                             Text(
                               statusLabels[entry.key]!,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black87,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,
                               ),

@@ -18,11 +18,23 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF262626),
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? Colors.black : Colors.grey).withValues(
+              alpha: 0.05,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,13 +43,13 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildChartTab('Confirmed'),
+                _buildChartTab('Confirmed', isDark),
                 8.w,
-                _buildChartTab('Awaited'),
+                _buildChartTab('Awaited', isDark),
                 8.w,
-                _buildChartTab('Cancelled'),
+                _buildChartTab('Cancelled', isDark),
                 8.w,
-                _buildChartTab('Failed'),
+                _buildChartTab('Failed', isDark),
               ],
             ),
           ),
@@ -50,7 +62,7 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: textColor.withValues(alpha: 0.1),
                     strokeWidth: 1,
                   ),
                 ),
@@ -67,7 +79,7 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                           child: Text(
                             '${(value / 1000).toInt()}k',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: textColor.withValues(alpha: 0.5),
                               fontSize: 12,
                             ),
                           ),
@@ -108,7 +120,7 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                             child: Text(
                               months[index],
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.5),
+                                color: textColor.withValues(alpha: 0.5),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -138,7 +150,7 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                             radius: 5,
                             color: AppColors.primaryRed,
                             strokeWidth: 2,
-                            strokeColor: Colors.white,
+                            strokeColor: isDark ? Colors.white : Colors.white,
                           ),
                     ),
                     belowBarData: BarAreaData(
@@ -159,20 +171,21 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                     }).toList(),
                     isCurved: true,
                     curveSmoothness: 0.15,
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: textColor.withValues(alpha: 0.15),
                     barWidth: 2,
                     dotData: const FlDotData(show: false),
                   ),
                 ],
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (touchedSpot) => const Color(0xFF2A2A2A),
+                    getTooltipColor: (touchedSpot) =>
+                        isDark ? const Color(0xFF2A2A2A) : Colors.white,
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
                           '${spot.y.toInt()}\$',
-                          const TextStyle(
-                            color: Colors.white,
+                          TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         );
@@ -196,7 +209,9 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                                     radius: 7,
                                     color: AppColors.primaryRed,
                                     strokeWidth: 2,
-                                    strokeColor: Colors.white,
+                                    strokeColor: isDark
+                                        ? Colors.white
+                                        : Colors.white,
                                   ),
                             ),
                           );
@@ -211,8 +226,9 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
     );
   }
 
-  Widget _buildChartTab(String label) {
+  Widget _buildChartTab(String label, bool isDark) {
     final active = _activeTab == label;
+    final textColor = isDark ? Colors.white : Colors.black;
     return GestureDetector(
       onTap: () => setState(() => _activeTab = label),
       child: Container(
@@ -232,7 +248,7 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
           style: TextStyle(
             color: active
                 ? AppColors.primaryRed
-                : Colors.white.withValues(alpha: 0.6),
+                : textColor.withValues(alpha: 0.6),
             fontSize: 15,
             fontWeight: active ? FontWeight.bold : FontWeight.w500,
           ),

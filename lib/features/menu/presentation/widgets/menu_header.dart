@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
+import 'package:mrpos/features/notifications/presentation/widgets/notification_bell.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 
@@ -44,7 +45,11 @@ class MenuHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          _NotificationButton(isDark: isDark),
+          NotificationBell(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
+          ),
           12.w,
           _UserAvatar(),
         ],
@@ -90,69 +95,6 @@ class _HoverIconButtonState extends State<_HoverIconButton> {
           color: widget.isDark
               ? AppColors.textPrimaryDark
               : AppColors.textPrimaryLight,
-        ),
-      ),
-    );
-  }
-}
-
-class _NotificationButton extends StatefulWidget {
-  final bool isDark;
-
-  const _NotificationButton({required this.isDark});
-
-  @override
-  State<_NotificationButton> createState() => _NotificationButtonState();
-}
-
-class _NotificationButtonState extends State<_NotificationButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: _isHovered
-              ? (widget.isDark ? AppColors.hoverDark : AppColors.hoverLight)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            IconButton(
-              icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
-              onPressed: () {
-                // TODO: Handle notifications
-              },
-              color: widget.isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
-            ),
-            // Notification badge
-            Positioned(
-              right: 8,
-              top: 8,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryRed,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: widget.isDark
-                        ? AppColors.cardDark
-                        : AppColors.cardLight,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

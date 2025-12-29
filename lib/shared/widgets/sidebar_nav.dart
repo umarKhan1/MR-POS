@@ -5,6 +5,8 @@ import 'package:mrpos/core/router/route_names.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mrpos/shared/theme/theme_cubit.dart';
 
 class SidebarNav extends StatefulWidget {
   final String? currentRoute;
@@ -68,9 +70,58 @@ class _SidebarNavState extends State<SidebarNav> {
             route: RouteNames.login,
             isLogout: true,
           ),
+          16.h,
+          _buildThemeToggle(),
           24.h,
         ],
       ),
+    );
+  }
+
+  Widget _buildThemeToggle() {
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, themeMode) {
+        final isDark = themeMode == ThemeMode.dark;
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  FaIcon(
+                    isDark ? FontAwesomeIcons.moon : FontAwesomeIcons.sun,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  16.w,
+                  Text(
+                    isDark ? 'Dark Mode' : 'Light Mode',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              Switch(
+                value: isDark,
+                onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                activeThumbColor: AppColors.primaryRed,
+                activeTrackColor: AppColors.primaryRed.withValues(alpha: 0.3),
+                inactiveThumbColor: Colors.white70,
+                inactiveTrackColor: Colors.white24,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

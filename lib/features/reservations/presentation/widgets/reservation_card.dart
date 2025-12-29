@@ -11,6 +11,7 @@ class ReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -22,13 +23,15 @@ class ReservationCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: reservation.status == ReservationStatus.confirmed
-                ? AppColors.primaryRed.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.2),
+                ? AppColors.primaryRed.withValues(alpha: isDark ? 0.2 : 0.1)
+                : (isDark ? Colors.grey : Colors.grey[300])!.withValues(
+                    alpha: 0.2,
+                  ),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: reservation.status == ReservationStatus.confirmed
                   ? AppColors.primaryRed
-                  : Colors.grey,
+                  : (isDark ? Colors.grey : Colors.grey[400])!,
               width: 1,
             ),
           ),
@@ -38,8 +41,8 @@ class ReservationCard extends StatelessWidget {
             children: [
               Text(
                 reservation.fullName,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -49,11 +52,18 @@ class ReservationCard extends StatelessWidget {
               4.h,
               Row(
                 children: [
-                  const Icon(Icons.people, color: Colors.white70, size: 12),
+                  Icon(
+                    Icons.people,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                    size: 12,
+                  ),
                   4.w,
                   Text(
                     '${reservation.numberOfGuests}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontSize: 11,
+                    ),
                   ),
                 ],
               ),

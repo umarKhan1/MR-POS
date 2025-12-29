@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mrpos/core/services/excel_export_service.dart';
+import 'package:mrpos/features/notifications/presentation/widgets/notification_bell.dart';
 import 'package:mrpos/features/reports/domain/models/revenue_report_models.dart';
 import 'package:mrpos/features/reports/domain/repositories/reports_repository.dart';
 import 'package:mrpos/features/reports/presentation/cubit/reports_cubit.dart';
 import 'package:mrpos/features/reports/presentation/cubit/reports_state.dart';
-import 'package:mrpos/features/reports/presentation/widgets/compact_date_picker_modal.dart';
+import 'package:mrpos/features/reports/presentation/widgets/advanced_date_range_picker.dart';
 import 'package:mrpos/features/reports/presentation/widgets/reports_table.dart';
 import 'package:mrpos/features/reports/presentation/widgets/revenue_doughnut_chart.dart';
 import 'package:mrpos/features/reports/presentation/widgets/revenue_line_chart.dart';
@@ -87,6 +88,8 @@ class _ReportsScreenContent extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, ResponsiveUtils responsive) {
     final isMobile = responsive.isMobile;
+    final isDark = context.isDarkMode;
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: responsive.responsive(mobile: 16, tablet: 24, desktop: 24),
@@ -94,51 +97,41 @@ class _ReportsScreenContent extends StatelessWidget {
       ),
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? Colors.black : Colors.grey).withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           if (isMobile) ...[
             Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white),
+                icon: Icon(
+                  Icons.menu,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
             8.w,
           ],
-          const Text(
+          Text(
             'Reports',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: isDark ? Colors.white : Colors.black,
             ),
           ),
           const Spacer(),
           // Notification with red dot
-          Stack(
-            children: [
-              const Icon(
-                Icons.notifications_none,
-                color: Colors.white,
-                size: 24,
-              ),
-              Positioned(
-                right: 2,
-                top: 2,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryRed,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          NotificationBell(color: isDark ? Colors.white : Colors.black),
           20.w,
           // Profile Icon (Red Circle with Person)
           Container(
@@ -208,6 +201,7 @@ class _ReportsScreenContent extends StatelessWidget {
   }
 
   Widget _buildDatePicker(BuildContext context, ResponsiveUtils responsive) {
+    final isDark = context.isDarkMode;
     return BlocBuilder<ReportsCubit, ReportsState>(
       builder: (context, state) {
         DateTimeRange range;
@@ -232,7 +226,8 @@ class _ReportsScreenContent extends StatelessWidget {
           onTap: () async {
             final picked = await showDialog<DateTimeRange>(
               context: context,
-              builder: (context) => CompactDatePickerModal(initialRange: range),
+              builder: (context) =>
+                  AdvancedDateRangePicker(initialRange: range),
             );
             if (picked != null) {
               if (context.mounted) {
@@ -244,9 +239,13 @@ class _ReportsScreenContent extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             width: responsive.isMobile ? double.infinity : null,
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
+              color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[100],
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.1,
+                ),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -259,8 +258,8 @@ class _ReportsScreenContent extends StatelessWidget {
                 10.w,
                 Text(
                   rangeText,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),

@@ -27,6 +27,7 @@ class OrderFilterTabs extends StatelessWidget {
           child: Row(
             children: [
               _buildTab(
+                context: context,
                 label: 'All',
                 count: counts?.totalOrders ?? 0,
                 isSelected: selectedFilter == null,
@@ -35,6 +36,7 @@ class OrderFilterTabs extends StatelessWidget {
               ),
               responsive.isMobile ? 8.w : 12.w,
               _buildTab(
+                context: context,
                 label: 'In Process',
                 count: counts?.inProcessCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.inProcess,
@@ -43,6 +45,7 @@ class OrderFilterTabs extends StatelessWidget {
               ),
               responsive.isMobile ? 8.w : 12.w,
               _buildTab(
+                context: context,
                 label: 'Completed',
                 count: counts?.completedCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.completed,
@@ -51,6 +54,7 @@ class OrderFilterTabs extends StatelessWidget {
               ),
               responsive.isMobile ? 8.w : 12.w,
               _buildTab(
+                context: context,
                 label: 'Cancelled',
                 count: counts?.cancelledCount ?? 0,
                 isSelected: selectedFilter == OrderStatus.cancelled,
@@ -65,12 +69,25 @@ class OrderFilterTabs extends StatelessWidget {
   }
 
   Widget _buildTab({
+    required BuildContext context,
     required String label,
     required int count,
     required bool isSelected,
     required VoidCallback onTap,
     required ResponsiveUtils responsive,
   }) {
+    final isDark = context.isDarkMode;
+    final unselectedBg = isDark ? const Color(0xFF2A2A2A) : Colors.grey[200];
+    final unselectedTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : Colors.black54;
+    final countBgPrimary = isDark
+        ? Colors.white.withValues(alpha: 0.2)
+        : Colors.white.withValues(alpha: 0.4);
+    final countBgSecondary = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -81,7 +98,7 @@ class OrderFilterTabs extends StatelessWidget {
             vertical: responsive.isMobile ? 8 : 10,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryRed : const Color(0xFF2A2A2A),
+            color: isSelected ? AppColors.primaryRed : unselectedBg,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -90,9 +107,7 @@ class OrderFilterTabs extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected
-                      ? Colors.white
-                      : Colors.white.withOpacity(0.7),
+                  color: isSelected ? Colors.white : unselectedTextColor,
                   fontWeight: FontWeight.w600,
                   fontSize: responsive.responsive(
                     mobile: 12.0,
@@ -109,15 +124,15 @@ class OrderFilterTabs extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? Colors.white.withOpacity(0.2)
-                        : Colors.white.withOpacity(0.1),
+                    color: isSelected ? countBgPrimary : countBgSecondary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     count.toString(),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? Colors.white : Colors.black87),
                       fontSize: responsive.responsive(
                         mobile: 10.0,
                         tablet: 11.0,

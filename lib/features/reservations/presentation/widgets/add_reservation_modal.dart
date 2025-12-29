@@ -130,12 +130,13 @@ class _AddReservationModalState extends State<AddReservationModal> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Container(
       width: 450,
       height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           bottomLeft: Radius.circular(16),
         ),
@@ -148,12 +149,15 @@ class _AddReservationModalState extends State<AddReservationModal> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.grey[50],
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                 ),
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey[800]!, width: 1),
+                  bottom: BorderSide(
+                    color: (isDark ? Colors.grey[800] : Colors.grey[200])!,
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
@@ -163,14 +167,17 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     widget.reservation == null
                         ? 'Add New Reservation'
                         : 'Edit Reservation',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark ? Colors.white : Colors.black54,
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -184,12 +191,13 @@ class _AddReservationModalState extends State<AddReservationModal> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Customer Details Section
-                    _buildSectionTitle('Customer Details'),
+                    _buildSectionTitle(context, 'Customer Details'),
                     16.h,
                     Row(
                       children: [
                         Expanded(
                           child: _buildTextField(
+                            context: context,
                             controller: _firstNameController,
                             label: 'First Name',
                             validator: (value) {
@@ -203,6 +211,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
                         16.w,
                         Expanded(
                           child: _buildTextField(
+                            context: context,
                             controller: _lastNameController,
                             label: 'Last Name',
                             validator: (value) {
@@ -217,6 +226,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     ),
                     16.h,
                     _buildTextField(
+                      context: context,
                       controller: _phoneController,
                       label: 'Phone Number',
                       keyboardType: TextInputType.phone,
@@ -229,6 +239,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     ),
                     16.h,
                     _buildTextField(
+                      context: context,
                       controller: _emailController,
                       label: 'Email Address',
                       keyboardType: TextInputType.emailAddress,
@@ -244,12 +255,13 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     ),
                     32.h,
                     // Reservation Details Section
-                    _buildSectionTitle('Reservation Details'),
+                    _buildSectionTitle(context, 'Reservation Details'),
                     16.h,
                     Row(
                       children: [
                         Expanded(
                           child: _buildDateTimePicker(
+                            context: context,
                             label: 'Date',
                             value: DateFormat(
                               'MMM dd, yyyy',
@@ -261,6 +273,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
                         16.w,
                         Expanded(
                           child: _buildDateTimePicker(
+                            context: context,
                             label: 'Time',
                             value: _selectedTime.format(context),
                             icon: Icons.access_time,
@@ -272,9 +285,9 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     16.h,
                     Row(
                       children: [
-                        Expanded(child: _buildGuestSelector()),
+                        Expanded(child: _buildGuestSelector(context)),
                         16.w,
-                        Expanded(child: _buildStatusDropdown()),
+                        Expanded(child: _buildStatusDropdown(context)),
                       ],
                     ),
                   ],
@@ -285,9 +298,12 @@ class _AddReservationModalState extends State<AddReservationModal> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.grey[50],
                 border: Border(
-                  top: BorderSide(color: Colors.grey[800]!, width: 1),
+                  top: BorderSide(
+                    color: (isDark ? Colors.grey[800] : Colors.grey[200])!,
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
@@ -296,8 +312,12 @@ class _AddReservationModalState extends State<AddReservationModal> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.grey[700]!),
+                        foregroundColor: isDark ? Colors.white : Colors.black87,
+                        side: BorderSide(
+                          color: (isDark
+                              ? Colors.grey[700]
+                              : Colors.grey[300])!,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -333,30 +353,33 @@ class _AddReservationModalState extends State<AddReservationModal> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final isDark = context.isDarkMode;
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: isDark ? Colors.white : Colors.black87,
       ),
     );
   }
 
   Widget _buildTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
+    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[400],
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -366,10 +389,10 @@ class _AddReservationModalState extends State<AddReservationModal> {
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF1A1A1A),
+            fillColor: isDark ? const Color(0xFF1A1A1A) : Colors.grey[100],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -386,18 +409,20 @@ class _AddReservationModalState extends State<AddReservationModal> {
   }
 
   Widget _buildDateTimePicker({
+    required BuildContext context,
     required String label,
     required String value,
     required IconData icon,
     required VoidCallback onTap,
   }) {
+    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[400],
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -410,7 +435,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -418,7 +443,10 @@ class _AddReservationModalState extends State<AddReservationModal> {
                 children: [
                   Text(
                     value,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontSize: 14,
+                    ),
                   ),
                   Icon(icon, color: AppColors.primaryRed, size: 18),
                 ],
@@ -430,14 +458,15 @@ class _AddReservationModalState extends State<AddReservationModal> {
     );
   }
 
-  Widget _buildGuestSelector() {
+  Widget _buildGuestSelector(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Number of Guests',
           style: TextStyle(
-            color: Colors.grey[400],
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -446,13 +475,17 @@ class _AddReservationModalState extends State<AddReservationModal> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[100],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.remove, color: Colors.white, size: 18),
+                icon: Icon(
+                  Icons.remove,
+                  color: isDark ? Colors.white : Colors.black87,
+                  size: 18,
+                ),
                 onPressed: () {
                   if (_numberOfGuests > 1) {
                     setState(() => _numberOfGuests--);
@@ -463,8 +496,8 @@ class _AddReservationModalState extends State<AddReservationModal> {
                 child: Center(
                   child: Text(
                     '$_numberOfGuests ${_numberOfGuests == 1 ? 'person' : 'persons'}',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -472,7 +505,11 @@ class _AddReservationModalState extends State<AddReservationModal> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.add, color: Colors.white, size: 18),
+                icon: Icon(
+                  Icons.add,
+                  color: isDark ? Colors.white : Colors.black87,
+                  size: 18,
+                ),
                 onPressed: () {
                   setState(() => _numberOfGuests++);
                 },
@@ -484,14 +521,15 @@ class _AddReservationModalState extends State<AddReservationModal> {
     );
   }
 
-  Widget _buildStatusDropdown() {
+  Widget _buildStatusDropdown(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Status',
           style: TextStyle(
-            color: Colors.grey[400],
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -500,16 +538,16 @@ class _AddReservationModalState extends State<AddReservationModal> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[100],
             borderRadius: BorderRadius.circular(8),
           ),
           child: DropdownButton<ReservationStatus>(
             value: _status,
             isExpanded: true,
-            dropdownColor: const Color(0xFF1A1A1A),
+            dropdownColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
             underline: const SizedBox(),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

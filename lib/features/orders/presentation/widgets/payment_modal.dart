@@ -138,8 +138,9 @@ class _PaymentModalState extends State<PaymentModal> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Dialog(
-      backgroundColor: const Color(0xFF2A2A2A),
+      backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 500,
@@ -157,15 +158,18 @@ class _PaymentModalState extends State<PaymentModal> {
                   children: [
                     Text(
                       widget.order.orderNumber,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
                     Text(
                       widget.order.customerName,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
@@ -209,8 +213,8 @@ class _PaymentModalState extends State<PaymentModal> {
                             children: [
                               Text(
                                 item.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -218,7 +222,9 @@ class _PaymentModalState extends State<PaymentModal> {
                               Text(
                                 'x ${item.quantity}',
                                 style: TextStyle(
-                                  color: Colors.grey[500],
+                                  color: isDark
+                                      ? Colors.grey[500]
+                                      : Colors.grey[600],
                                   fontSize: 12,
                                 ),
                               ),
@@ -227,8 +233,8 @@ class _PaymentModalState extends State<PaymentModal> {
                         ),
                         Text(
                           '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -241,9 +247,9 @@ class _PaymentModalState extends State<PaymentModal> {
             ),
             24.h,
             // Summary
-            _buildSummaryRow('Subtotal', widget.order.subtotal),
+            _buildSummaryRow(context, 'Subtotal', widget.order.subtotal),
             8.h,
-            _buildSummaryRow('Tax 5%', widget.order.tax),
+            _buildSummaryRow(context, 'Tax 5%', widget.order.tax),
             8.h,
             // Tip input
             Row(
@@ -251,19 +257,27 @@ class _PaymentModalState extends State<PaymentModal> {
               children: [
                 Text(
                   'Tip',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
                 ),
                 SizedBox(
                   width: 100,
                   child: TextField(
                     controller: _tipController,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 14,
+                    ),
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
-                      prefix: const Text(
+                      prefix: Text(
                         '\$',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
@@ -272,11 +286,15 @@ class _PaymentModalState extends State<PaymentModal> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: Colors.grey[700]!),
+                        borderSide: BorderSide(
+                          color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: Colors.grey[700]!),
+                        borderSide: BorderSide(
+                          color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        ),
                       ),
                     ),
                     onChanged: (_) => setState(() {}),
@@ -291,20 +309,20 @@ class _PaymentModalState extends State<PaymentModal> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Total',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
                 Text(
                   '\$${_totalWithTip.toStringAsFixed(2)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
               ],
@@ -317,23 +335,28 @@ class _PaymentModalState extends State<PaymentModal> {
                 children: [
                   Text(
                     'Received',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
                   ),
                   SizedBox(
                     width: 120,
                     child: TextField(
                       controller: _receivedController,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.right,
                       decoration: InputDecoration(
-                        prefix: const Text(
+                        prefix: Text(
                           '\$',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
@@ -342,7 +365,11 @@ class _PaymentModalState extends State<PaymentModal> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: Colors.grey[700]!),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? Colors.grey[700]!
+                                : Colors.grey[300]!,
+                          ),
                         ),
                       ),
                       onChanged: (_) => setState(() {}),
@@ -353,12 +380,12 @@ class _PaymentModalState extends State<PaymentModal> {
               16.h,
             ],
             // Payment methods
-            const Text(
+            Text(
               'Payment Method',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: isDark ? Colors.white : Colors.black,
               ),
             ),
             16.h,
@@ -406,17 +433,24 @@ class _PaymentModalState extends State<PaymentModal> {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount) {
+  Widget _buildSummaryRow(BuildContext context, String label, double amount) {
+    final isDark = context.isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
         Text(
           '\$${amount.toStringAsFixed(2)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
       ],
@@ -424,6 +458,7 @@ class _PaymentModalState extends State<PaymentModal> {
   }
 
   Widget _buildPaymentMethodButton(String label, IconData icon, String value) {
+    final isDark = context.isDarkMode;
     final isSelected = _selectedPaymentMethod == value;
     return GestureDetector(
       onTap: () => setState(() => _selectedPaymentMethod = value),
@@ -431,11 +466,13 @@ class _PaymentModalState extends State<PaymentModal> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryRed.withOpacity(0.2)
-              : const Color(0xFF1A1A1A),
+              ? AppColors.primaryRed.withValues(alpha: 0.2)
+              : (isDark ? const Color(0xFF1A1A1A) : Colors.grey[100]),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.primaryRed : Colors.grey[800]!,
+            color: isSelected
+                ? AppColors.primaryRed
+                : (isDark ? Colors.grey[800]! : Colors.grey[300]!),
             width: 2,
           ),
         ),
@@ -443,7 +480,9 @@ class _PaymentModalState extends State<PaymentModal> {
           children: [
             Icon(
               icon,
-              color: isSelected ? AppColors.primaryRed : Colors.grey[600],
+              color: isSelected
+                  ? AppColors.primaryRed
+                  : (isDark ? Colors.grey[600] : Colors.grey[400]),
               size: 32,
             ),
             8.h,
@@ -452,7 +491,9 @@ class _PaymentModalState extends State<PaymentModal> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? AppColors.primaryRed : Colors.grey[400],
+                color: isSelected
+                    ? AppColors.primaryRed
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
               ),
             ),
           ],
@@ -501,8 +542,9 @@ class _CardPaymentDialogState extends State<CardPaymentDialog>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Dialog(
-      backgroundColor: const Color(0xFF2A2A2A),
+      backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 400,
@@ -517,18 +559,21 @@ class _CardPaymentDialogState extends State<CardPaymentDialog>
                 color: AppColors.primaryRed,
               ),
               24.h,
-              const Text(
+              Text(
                 'Tap Your Card',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
               ),
               16.h,
               Text(
                 'Hold your card near the reader',
-                style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
               ),
               32.h,
               SizedBox(
@@ -578,12 +623,12 @@ class _CardPaymentDialogState extends State<CardPaymentDialog>
             ] else if (_success) ...[
               const Icon(Icons.check_circle, size: 80, color: Colors.green),
               24.h,
-              const Text(
+              Text(
                 'Payment Successful!',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
               ),
             ],

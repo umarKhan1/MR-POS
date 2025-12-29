@@ -61,6 +61,8 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
           );
         }
 
+        final isDark = context.isDarkMode;
+
         final currentState = state is CreateOrderInitial
             ? state
             : const CreateOrderInitial();
@@ -73,24 +75,31 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                border: Border(bottom: BorderSide(color: Colors.grey[800]!)),
+                color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: (isDark ? Colors.grey[800] : Colors.grey[200])!,
+                  ),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Order $orderNumber',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                   // Show close button only if onClose callback is provided (mobile/tablet)
                   if (widget.onClose != null)
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: Icon(
+                        Icons.close,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                       onPressed: widget.onClose,
                       tooltip: 'Close',
                     ),
@@ -103,7 +112,9 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
                   ? Center(
                       child: Text(
                         'No items in cart',
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[600] : Colors.grey[400],
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -119,36 +130,40 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                border: Border(top: BorderSide(color: Colors.grey[800]!)),
+                color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: (isDark ? Colors.grey[800] : Colors.grey[200])!,
+                  ),
+                ),
               ),
               child: Column(
                 children: [
-                  _buildSummaryRow('Subtotal', currentState.subtotal),
+                  _buildSummaryRow(context, 'Subtotal', currentState.subtotal),
                   8.h,
-                  _buildSummaryRow('Tax', currentState.tax),
+                  _buildSummaryRow(context, 'Tax', currentState.tax),
                   8.h,
-                  _buildSummaryRow('Charges', currentState.charges),
+                  _buildSummaryRow(context, 'Charges', currentState.charges),
                   16.h,
-                  Divider(color: Colors.grey[700]),
+                  Divider(color: isDark ? Colors.grey[700] : Colors.grey[200]),
                   12.h,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Total',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                       Text(
                         '\$${currentState.total.toStringAsFixed(2)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                     ],
@@ -190,17 +205,23 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount) {
+  Widget _buildSummaryRow(BuildContext context, String label, double amount) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
         Text(
           '\$${amount.toStringAsFixed(2)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: context.isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
       ],
@@ -215,12 +236,16 @@ class _CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+        ),
       ),
       child: Row(
         children: [
@@ -229,10 +254,13 @@ class _CartItemWidget extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
+              color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.restaurant, color: Colors.grey[600]),
+            child: Icon(
+              Icons.restaurant,
+              color: isDark ? Colors.grey[600] : Colors.grey[400],
+            ),
           ),
           12.w,
           // Details
@@ -242,10 +270,10 @@ class _CartItemWidget extends StatelessWidget {
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -253,7 +281,7 @@ class _CartItemWidget extends StatelessWidget {
                 4.h,
                 Text(
                   '\$${item.price.toStringAsFixed(2)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryRed,
@@ -266,6 +294,7 @@ class _CartItemWidget extends StatelessWidget {
           Row(
             children: [
               _buildQuantityButton(
+                context,
                 icon: Icons.remove,
                 onPressed: () {
                   context.read<CreateOrderCubit>().updateQuantity(
@@ -277,14 +306,15 @@ class _CartItemWidget extends StatelessWidget {
               12.w,
               Text(
                 item.quantity.toString(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
               12.w,
               _buildQuantityButton(
+                context,
                 icon: Icons.add,
                 onPressed: () {
                   context.read<CreateOrderCubit>().updateQuantity(
@@ -300,7 +330,8 @@ class _CartItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildQuantityButton({
+  Widget _buildQuantityButton(
+    BuildContext context, {
     required IconData icon,
     required VoidCallback onPressed,
   }) {

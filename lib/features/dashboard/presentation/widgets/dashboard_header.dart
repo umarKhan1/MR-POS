@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
+import 'package:mrpos/features/notifications/presentation/widgets/notification_bell.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
@@ -28,14 +29,8 @@ class DashboardHeader extends StatelessWidget {
         ],
         Text(AppStrings.dashboard, style: context.textTheme.headlineMedium),
         const Spacer(),
-        IconButton(
-          icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
-          onPressed: () {
-            // TODO: Handle notifications
-          },
-          color: context.isDarkMode
-              ? AppColors.textPrimaryDark
-              : AppColors.textPrimaryLight,
+        const NotificationBell(
+          color: null, // It will use theme which is what was being used
         ),
         12.w,
         CircleAvatar(

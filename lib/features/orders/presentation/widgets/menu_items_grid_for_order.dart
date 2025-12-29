@@ -31,7 +31,7 @@ class MenuItemsGridForOrder extends StatelessWidget {
                 desktop: 20.0,
               ),
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: context.isDarkMode ? Colors.white : Colors.black87,
             ),
           ),
         ),
@@ -91,6 +91,7 @@ class _MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     final isOutOfStock = item.quantity <= 0 || !item.isAvailable;
 
     return LayoutBuilder(
@@ -112,11 +113,13 @@ class _MenuItemCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: (isDark ? Colors.black : Colors.grey).withValues(
+                  alpha: 0.1,
+                ),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -133,7 +136,9 @@ class _MenuItemCard extends StatelessWidget {
                     height: imageHeight,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
+                      color: isDark
+                          ? const Color(0xFF1A1A1A)
+                          : Colors.grey[100],
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(12),
                       ),
@@ -160,8 +165,8 @@ class _MenuItemCard extends StatelessWidget {
                             fontSize: titleSize,
                             fontWeight: FontWeight.w600,
                             color: isOutOfStock
-                                ? Colors.grey[600]
-                                : Colors.white,
+                                ? Colors.grey[isDark ? 800 : 400]
+                                : (isDark ? Colors.white : Colors.black87),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -172,8 +177,10 @@ class _MenuItemCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: descSize,
                             color: isOutOfStock
-                                ? Colors.grey[700]
-                                : Colors.grey[400],
+                                ? Colors.grey[isDark ? 900 : 300]
+                                : (isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600]),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -266,12 +273,18 @@ class _MenuItemCard extends StatelessWidget {
   }
 
   void _showOutOfStockDialog(BuildContext context) {
+    final isDark = context.isDarkMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Out of Stock'),
+        backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+        title: Text(
+          'Out of Stock',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+        ),
         content: Text(
           '${item.name} is currently out of stock and cannot be added to your order.',
+          style: TextStyle(color: isDark ? Colors.grey[400] : Colors.black54),
         ),
         actions: [
           TextButton(

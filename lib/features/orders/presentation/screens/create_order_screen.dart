@@ -49,9 +49,12 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: isDark
+          ? const Color(0xFF1A1A1A)
+          : Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Main content
@@ -67,10 +70,12 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                   ),
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: (isDark ? Colors.black : Colors.grey).withOpacity(
+                        0.1,
+                      ),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -80,7 +85,10 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                   children: [
                     // Back button
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                       onPressed: () => GoRouter.of(context).pop(),
                       tooltip: 'Back',
                     ),
@@ -100,7 +108,7 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                             desktop: 20.0,
                           ),
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
@@ -116,9 +124,9 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                             clipBehavior: Clip.none,
                             children: [
                               IconButton(
-                                icon: const FaIcon(
+                                icon: FaIcon(
                                   FontAwesomeIcons.cartShopping,
-                                  color: Colors.white,
+                                  color: isDark ? Colors.white : Colors.black87,
                                 ),
                                 onPressed: _toggleCart,
                                 tooltip: 'View Cart',
@@ -161,16 +169,19 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                 child: Row(
                   children: [
                     // Menu items (always visible)
-                    Expanded(child: const MenuItemsGridForOrder()),
+                    const Expanded(child: MenuItemsGridForOrder()),
                     // Cart sidebar (desktop only - always visible)
                     if (responsive.isDesktop)
                       Container(
                         width: 380,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A2A),
+                          color: isDark
+                              ? AppColors.cardDark
+                              : AppColors.cardLight,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: (isDark ? Colors.black : Colors.grey)
+                                  .withOpacity(0.1),
                               blurRadius: 10,
                               offset: const Offset(-2, 0),
                             ),
@@ -203,10 +214,13 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                       child: Container(
                         width: responsive.isMobile ? responsive.width : 380,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A2A),
+                          color: isDark
+                              ? AppColors.cardDark
+                              : AppColors.cardLight,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: (isDark ? Colors.black : Colors.grey)
+                                  .withOpacity(0.1),
                               blurRadius: 10,
                               offset: const Offset(-2, 0),
                             ),

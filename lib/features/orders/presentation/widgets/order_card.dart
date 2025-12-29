@@ -21,20 +21,34 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
+    final isDark = context.isDarkMode;
 
     return Container(
       padding: EdgeInsets.all(
         responsive.responsive(mobile: 10.0, tablet: 12.0, desktop: 14.0),
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
         border: order.status == OrderStatus.inProcess
             ? Border.all(
                 color: AppColors.primaryRed.withValues(alpha: 0.5),
                 width: 2,
               )
-            : null,
+            : Border.all(
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.05,
+                ),
+              ),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? Colors.black : Colors.grey).withValues(
+              alpha: 0.05,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +95,7 @@ class OrderCard extends StatelessWidget {
                     Text(
                       order.customerName,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : Colors.black,
                         fontSize: responsive.responsive(
                           mobile: 12.0,
                           tablet: 13.0,
@@ -97,7 +111,8 @@ class OrderCard extends StatelessWidget {
                         Text(
                           'Order ${order.orderNumber}',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
+                            color: (isDark ? Colors.white : Colors.black)
+                                .withValues(alpha: 0.5),
                             fontSize: responsive.responsive(
                               mobile: 9.0,
                               tablet: 10.0,
@@ -142,7 +157,7 @@ class OrderCard extends StatelessWidget {
                   ),
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[200],
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -151,7 +166,8 @@ class OrderCard extends StatelessWidget {
                     Text(
                       order.statusDetail,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.7),
                         fontSize: responsive.responsive(
                           mobile: 8.0,
                           tablet: 9.0,
@@ -162,7 +178,9 @@ class OrderCard extends StatelessWidget {
                     4.w,
                     Icon(
                       Icons.keyboard_arrow_down,
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: (isDark ? Colors.white : Colors.black).withValues(
+                        alpha: 0.5,
+                      ),
                       size: 12,
                     ),
                   ],
@@ -177,7 +195,7 @@ class OrderCard extends StatelessWidget {
               responsive.responsive(mobile: 6.0, tablet: 8.0, desktop: 10.0),
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -194,7 +212,8 @@ class OrderCard extends StatelessWidget {
                       child: Text(
                         'Qty',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.4),
                           fontSize: responsive.responsive(
                             mobile: 8.0,
                             tablet: 9.0,
@@ -208,7 +227,8 @@ class OrderCard extends StatelessWidget {
                       child: Text(
                         'Items',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.4),
                           fontSize: responsive.responsive(
                             mobile: 8.0,
                             tablet: 9.0,
@@ -221,7 +241,8 @@ class OrderCard extends StatelessWidget {
                     Text(
                       'Price',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.4),
                         fontSize: responsive.responsive(
                           mobile: 8.0,
                           tablet: 9.0,
@@ -254,7 +275,7 @@ class OrderCard extends StatelessWidget {
                           child: Text(
                             item.quantity.toString().padLeft(2, '0'),
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isDark ? Colors.white : Colors.black87,
                               fontSize: responsive.responsive(
                                 mobile: 9.0,
                                 tablet: 10.0,
@@ -267,7 +288,7 @@ class OrderCard extends StatelessWidget {
                           child: Text(
                             item.name,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isDark ? Colors.white : Colors.black87,
                               fontSize: responsive.responsive(
                                 mobile: 9.0,
                                 tablet: 10.0,
@@ -281,7 +302,7 @@ class OrderCard extends StatelessWidget {
                         Text(
                           '\$${item.price.toStringAsFixed(0)}',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: isDark ? Colors.white : Colors.black87,
                             fontSize: responsive.responsive(
                               mobile: 9.0,
                               tablet: 10.0,
@@ -304,7 +325,7 @@ class OrderCard extends StatelessWidget {
               Text(
                 'SubTotal',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: responsive.responsive(
                     mobile: 10.0,
                     tablet: 11.0,
@@ -316,7 +337,7 @@ class OrderCard extends StatelessWidget {
               Text(
                 '\$${order.subtotal.toStringAsFixed(0)}',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: responsive.responsive(
                     mobile: 10.0,
                     tablet: 11.0,
@@ -334,6 +355,7 @@ class OrderCard extends StatelessWidget {
             Row(
               children: [
                 _buildActionButton(
+                  context: context,
                   icon: FontAwesomeIcons.penToSquare,
                   onPressed: () {
                     GoRouter.of(
@@ -344,6 +366,7 @@ class OrderCard extends StatelessWidget {
                 ),
                 8.w,
                 _buildActionButton(
+                  context: context,
                   icon: FontAwesomeIcons.trash,
                   onPressed: () => _cancelOrder(context),
                   responsive: responsive,
@@ -434,10 +457,12 @@ class OrderCard extends StatelessWidget {
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required VoidCallback onPressed,
     required ResponsiveUtils responsive,
   }) {
+    final isDark = context.isDarkMode;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -446,15 +471,21 @@ class OrderCard extends StatelessWidget {
           width: responsive.isMobile ? 36 : 40,
           height: responsive.isMobile ? 36 : 40,
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.1,
+              ),
+            ),
           ),
           child: Center(
             child: FaIcon(
               icon,
               size: responsive.isMobile ? 12 : 14,
-              color: Colors.white.withValues(alpha: 0.6),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.6,
+              ),
             ),
           ),
         ),

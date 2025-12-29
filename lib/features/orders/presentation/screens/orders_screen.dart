@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_state.dart';
@@ -15,8 +16,11 @@ class OrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, responsive) {
+        final isDark = context.isDarkMode;
         return Container(
-          color: const Color(0xFF1A1A1A),
+          color: isDark
+              ? const Color(0xFF1A1A1A)
+              : Theme.of(context).scaffoldBackgroundColor,
           child: SingleChildScrollView(
             padding: EdgeInsets.all(responsive.padding),
             child: Column(
@@ -31,7 +35,7 @@ class OrdersScreen extends StatelessWidget {
                     if (state is OrdersLoading) {
                       return const Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFFFFB3C1),
+                          color: AppColors.primaryRed,
                         ),
                       );
                     }
@@ -53,7 +57,9 @@ class OrdersScreen extends StatelessWidget {
                             child: Text(
                               'No orders found',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.5),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.5)
+                                    : Colors.black.withValues(alpha: 0.5),
                                 fontSize: 16,
                               ),
                             ),
