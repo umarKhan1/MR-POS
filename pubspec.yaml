@@ -77,6 +77,8 @@ dependencies:
   # Icons & Charts
   font_awesome_flutter: ^10.7.0
   fl_chart: ^0.69.2
+  excel: ^4.0.6
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_test:

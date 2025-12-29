@@ -212,6 +212,7 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
               isPerishable: menuItem.isPerishable,
               category: menuItem.category,
               price: menuItem.price,
+              costPrice: menuItem.costPrice,
               isAvailable: newQuantity > 0,
               menuType: menuItem.menuType,
             );

@@ -24,6 +24,7 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
   final _descriptionController = TextEditingController();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
+  final _costPriceController = TextEditingController();
   String? _selectedCategoryId;
   String? _selectedMenuType;
   String _selectedStockStatus = 'instock';
@@ -40,6 +41,7 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
       _descriptionController.text = item.description;
       _quantityController.text = item.quantity.toString();
       _priceController.text = item.price.toString();
+      _costPriceController.text = item.costPrice.toString();
       _selectedStockStatus = item.stockStatus;
       _isAvailable = item.isAvailable;
       _isPerishable = item.isPerishable;
@@ -60,6 +62,7 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
     _descriptionController.dispose();
     _quantityController.dispose();
     _priceController.dispose();
+    _costPriceController.dispose();
     super.dispose();
   }
 
@@ -87,6 +90,7 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
             stockStatus: _selectedStockStatus,
             isPerishable: _isPerishable,
             price: double.tryParse(_priceController.text) ?? 0.0,
+            costPrice: double.tryParse(_costPriceController.text) ?? 0.0,
             image: widget.itemToEdit!.image,
             isAvailable: _isAvailable,
             menuType: _selectedMenuType ?? 'Normal Menu',
@@ -106,6 +110,7 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
           stockStatus: _selectedStockStatus,
           isPerishable: _isPerishable,
           price: double.tryParse(_priceController.text) ?? 0.0,
+          costPrice: double.tryParse(_costPriceController.text) ?? 0.0,
           image: '',
           isAvailable: _isAvailable,
           menuType: _selectedMenuType ?? 'Normal Menu',
@@ -350,6 +355,25 @@ class _AddMenuItemModalState extends State<AddMenuItemModal> {
                             }
                             if (double.tryParse(value) == null) {
                               return 'Please enter a valid price';
+                            }
+                            return null;
+                          },
+                        ),
+                        16.h,
+                        // Cost Price
+                        CustomFormField(
+                          controller: _costPriceController,
+                          label: 'Cost Price',
+                          hint: 'Enter cost price',
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter cost price';
+                            }
+                            if (double.tryParse(value) == null) {
+                              return 'Please enter a valid cost price';
                             }
                             return null;
                           },

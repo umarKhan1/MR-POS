@@ -44,11 +44,6 @@ class _SidebarNavState extends State<SidebarNav> {
                     route: RouteNames.menu,
                   ),
                   _buildNavItem(
-                    icon: FontAwesomeIcons.userGroup,
-                    label: AppStrings.staff,
-                    route: RouteNames.staff,
-                  ),
-                  _buildNavItem(
                     icon: FontAwesomeIcons.chartLine,
                     label: AppStrings.reports,
                     route: RouteNames.reports,

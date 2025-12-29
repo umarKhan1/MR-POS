@@ -52,7 +52,6 @@ class AppStrings {
   // Dashboard
   static const String dashboard = 'Dashboard';
   static const String menuNav = 'Menu';
-  static const String staff = 'Staff';
   static const String inventory = 'Inventory';
   static const String reports = 'Reports';
   static const String orderTable = 'Order/Table';

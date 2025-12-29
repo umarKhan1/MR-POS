@@ -4,7 +4,6 @@ class RouteNames {
   static const String login = '/login';
   static const String dashboard = '/dashboard';
   static const String menu = '/menu';
-  static const String staff = '/staff';
   static const String inventory = '/inventory';
   static const String reports = '/reports';
   static const String orderTable = '/order-table';

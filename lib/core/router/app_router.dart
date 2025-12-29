@@ -9,6 +9,7 @@ import 'package:mrpos/features/orders/presentation/screens/orders_screen.dart';
 import 'package:mrpos/features/orders/presentation/screens/create_order_screen.dart';
 import 'package:mrpos/features/reservations/presentation/screens/reservations_screen.dart';
 import 'package:mrpos/features/reservations/presentation/screens/reservation_details_screen.dart';
+import 'package:mrpos/features/reports/presentation/screens/reports_screen.dart';
 import 'package:mrpos/shared/layouts/main_layout.dart';
 
 class AppRouter {
@@ -49,6 +50,11 @@ class AppRouter {
             path: RouteNames.reservation,
             name: RouteNames.reservation,
             builder: (context, state) => const ReservationsScreen(),
+          ),
+          GoRoute(
+            path: RouteNames.reports,
+            name: RouteNames.reports,
+            builder: (context, state) => const ReportsScreen(),
           ),
         ],
       ),
