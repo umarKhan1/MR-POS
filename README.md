@@ -42,39 +42,42 @@ MR-POS is a powerful, cross-platform Point of Sale (POS) system designed for mod
 ## Visual Gallery
 
 ### Dashboard & Analytics
-| Today's Overview | Dark Mode Trends | Stats Breakdown |
-| :---: | :---: | :---: |
-| ![Light Mode 1](assets/screenshot/DASHBOARD%20LIGHT%20THEME%20MODE%201.png) | ![Dark Mode 3](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%203.png) | ![Dark Mode 5](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%205.png) |
-| ![Light Mode 2](assets/screenshot/DASHBOARD%20LIGHT%20THEME%20MODE%202.png) | ![Dark Mode 4](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%204.png) | |
+| Today's Overview (Light) | Today's Overview (Dark) |
+| :---: | :---: |
+| ![Light Mode 1](assets/screenshot/DASHBOARD%20LIGHT%20THEME%20MODE%201.png) | ![Dark Mode 3](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%203.png) |
+| ![Light Mode 2](assets/screenshot/DASHBOARD%20LIGHT%20THEME%20MODE%202.png) | ![Dark Mode 4](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%204.png) |
+| ![Stats Breakdown (Light)](assets/screenshot/reportslight.png) | ![Stats Breakdown (Dark)](assets/screenshot/DASHBOARD%20DARK%20THEME%20MODE%205.png) |
 
 ### Menu Management
-| Category List | Create Category | Create Menu Item |
-| :---: | :---: | :---: |
-| ![Menu Dark](assets/screenshot/menudark.png) | ![Create Category Light](assets/screenshot/createmenulight.png) | ![Create Item Light](assets/screenshot/createmenulight.png) |
-| ![Menu Light 5](assets/screenshot/Menu%20LIGHT%20THEME%20MODE%205.png) | ![Create Category Dark](assets/screenshot/createmenudark.png) | ![Create Item Dark](assets/screenshot/createmenudark.png) |
+| Category Management | Menu Item Management |
+| :---: | :---: |
+| ![Menu List (Light)](assets/screenshot/Menu%20LIGHT%20THEME%20MODE%205.png) | ![Menu List (Dark)](assets/screenshot/menudark.png) |
+| ![Create Category (Light)](assets/screenshot/createmenulight.png) | ![Create Category (Dark)](assets/screenshot/createmenudark.png) |
 
 ### Order System & Cart
-| Order Selection | Screen Layout | Order Tracking |
-| :---: | :---: | :---: |
-| ![Order Dark](assets/screenshot/orderdarkscreen.png) | ![Order Light](assets/screenshot/orderlightscreen.png) | ![Orders List Dark](assets/screenshot/orderscreendark.png) |
-| | | ![Orders List Light](assets/screenshot/orderscreenlight.png) |
+| Order Selection | Screen Layout |
+| :---: | :---: |
+| ![Order Selection (Dark)](assets/screenshot/orderdarkscreen.png) | ![Order Selection (Light)](assets/screenshot/orderlightscreen.png) |
+| ![Order Tracking (Dark)](assets/screenshot/orderscreendark.png) | ![Order Tracking (Light)](assets/screenshot/orderscreenlight.png) |
 
 ### Payment & Receipts
-| Payment Options | Cash/Card Process | Digital Receipts |
-| :---: | :---: | :---: |
-| ![Payment Light](assets/screenshot/paymentlight.png) | ![Card Light](assets/screenshot/cardpayment%20light.png) | ![Receipt Light](assets/screenshot/reciptlight.png) |
-| ![Payment Dark](assets/screenshot/paymentdark.png) | ![Card Dark](assets/screenshot/cardpaymentdark.png) | ![Receipt Dark](assets/screenshot/reciptdark.png) |
+| Payment Process | Professional Receipts |
+| :---: | :---: |
+| ![Payment (Light)](assets/screenshot/paymentlight.png) | ![Receipt (Light)](assets/screenshot/reciptlight.png) |
+| ![Payment (Dark)](assets/screenshot/paymentdark.png) | ![Receipt (Dark)](assets/screenshot/reciptdark.png) |
+| ![Card Payment (Light)](assets/screenshot/cardpayment%20light.png) | ![Card Payment (Dark)](assets/screenshot/cardpaymentdark.png) |
 
 ### Reservations
-| Reservation Grid | Adding Reservation | Reservation Details |
-| :---: | :---: | :---: |
-| ![Res Screen Dark](assets/screenshot/reservationscreendark.png) | ![Add Res Light](assets/screenshot/createreservationlight.png) | ![Res Details Light](assets/screenshot/reservationdetailslight.png) |
-| ![Res Screen Light](assets/screenshot/reservationscreenlight.png) | ![Add Res Dark](assets/screenshot/createreservationdark.png) | ![Res Details Dark](assets/screenshot/resevationdetaildark.png) |
+| Reservation Management | Details View |
+| :---: | :---: |
+| ![Res Grid (Light)](assets/screenshot/reservationscreenlight.png) | ![Res Grid (Dark)](assets/screenshot/reservationscreendark.png) |
+| ![Add Res (Light)](assets/screenshot/createreservationlight.png) | ![Add Res (Dark)](assets/screenshot/createreservationdark.png) |
+| ![Res Details (Light)](assets/screenshot/reservationdetailslight.png) | ![Res Details (Dark)](assets/screenshot/resevationdetaildark.png) |
 
 ### Notifications
-| List View |
-| :---: |
-| ![Notifications](assets/screenshot/lightnotification.png) |
+| Alert Center (Light) | Alert Center (Dark) |
+| :---: | :---: |
+| ![Notifications Light](assets/screenshot/lightnotification.png) | ![Notifications Dark](assets/screenshot/notficationdark.png) |
 
 ---
 
