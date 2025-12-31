@@ -74,10 +74,15 @@ MR-POS is a powerful, cross-platform Point of Sale (POS) system designed for mod
 | ![Add Res (Light)](assets/screenshot/createreservationlight.png) | ![Add Res (Dark)](assets/screenshot/createreservationdark.png) |
 | ![Res Details (Light)](assets/screenshot/reservationdetailslight.png) | ![Res Details (Dark)](assets/screenshot/resevationdetaildark.png) |
 
+### Authentication
+| Sign In (Light) | Sign In (Dark) |
+| :---: | :---: |
+| ![Auth Light](assets/screenshot/authlight.png) | ![Auth Dark](assets/screenshot/authdark.png) |
+
 ### Notifications
 | Alert Center (Light) | Alert Center (Dark) |
 | :---: | :---: |
-| ![Notifications Light](assets/screenshot/lightnotification.png) | ![Notifications Dark](assets/screenshot/notficationdark.png) |
+| ![Notifications Light](assets/screenshot/lightnotification.png) | ![Notifications Dark](assets/screenshot/notificationdark.png) |
 
 ---
 
