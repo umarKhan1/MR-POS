@@ -1,11 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/features/authentication/presentation/bloc/auth_cubit.dart';
+import 'package:mrpos/features/authentication/data/repositories/mock_auth_repository.dart';
+import 'package:mrpos/features/authentication/data/repositories/firebase_auth_repository.dart';
 import 'package:mrpos/features/menu/data/repositories/firestore_menu_repository.dart';
 import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 import 'package:mrpos/features/notifications/domain/repositories/notification_repository.dart';
 import 'package:mrpos/features/notifications/presentation/cubit/notification_cubit.dart';
 import 'package:mrpos/features/orders/data/repositories/orders_repository.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
+import 'package:mrpos/features/reservations/data/repositories/firestore_reservations_repository.dart';
 import 'package:mrpos/features/reservations/presentation/cubit/reservations_cubit.dart';
 
 import 'package:mrpos/features/dashboard/presentation/cubit/dashboard_cubit.dart';
@@ -17,7 +20,10 @@ class AppProviders {
   static List<BlocProvider> get providers => [
     BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
     BlocProvider<AuthCubit>(
-      create: (context) => AuthCubit()..checkAuthStatus(),
+      create: (context) => AuthCubit(
+        // Toggle between MockAuthRepository() and FirebaseAuthRepository()
+        MockAuthRepository(),
+      ),
     ),
     BlocProvider<NotificationCubit>(
       create: (context) =>
@@ -37,7 +43,9 @@ class AppProviders {
           DashboardCubit(OrdersRepository(), FirestoreMenuRepository()),
     ),
     BlocProvider<ReservationsCubit>(
-      create: (context) => ReservationsCubit()..loadReservations(),
+      create: (context) =>
+          ReservationsCubit(FirestoreReservationsRepository())
+            ..loadReservations(),
     ),
   ];
 }

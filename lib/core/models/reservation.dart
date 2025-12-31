@@ -80,4 +80,45 @@ class Reservation {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'phoneNumber': phoneNumber,
+      'emailAddress': emailAddress,
+      'reservationDate': reservationDate.toIso8601String(),
+      'reservationTime': '${reservationTime.hour}:${reservationTime.minute}',
+      'numberOfGuests': numberOfGuests,
+      'status': status.name,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory Reservation.fromMap(Map<String, dynamic> map, String documentId) {
+    final timeParts = (map['reservationTime'] as String).split(':');
+    return Reservation(
+      id: documentId,
+      firstName: map['firstName'] ?? '',
+      lastName: map['lastName'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
+      emailAddress: map['emailAddress'] ?? '',
+      reservationDate: map['reservationDate'] != null
+          ? DateTime.parse(map['reservationDate'])
+          : DateTime.now(),
+      reservationTime: TimeOfDay(
+        hour: int.parse(timeParts[0]),
+        minute: int.parse(timeParts[1]),
+      ),
+      numberOfGuests: (map['numberOfGuests'] as num?)?.toInt() ?? 0,
+      status: ReservationStatus.values.firstWhere(
+        (e) => e.name == map['status'],
+        orElse: () => ReservationStatus.pending,
+      ),
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'])
+          : DateTime.now(),
+    );
+  }
 }

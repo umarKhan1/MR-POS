@@ -104,9 +104,7 @@ class _AddReservationModalState extends State<AddReservationModal> {
   void _saveReservation() {
     if (_formKey.currentState!.validate()) {
       final reservation = Reservation(
-        id:
-            widget.reservation?.id ??
-            'res_${DateTime.now().millisecondsSinceEpoch}',
+        id: widget.reservation?.id ?? '',
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         phoneNumber: _phoneController.text.trim(),

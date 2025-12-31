@@ -202,7 +202,7 @@ class MenuCategory extends Equatable {
       name: data['name'] ?? '',
       iconAsset: data['iconAsset'],
       iconKey: data['iconKey'] ?? 'all',
-      itemCount: data['itemCount'] ?? 0,
+      itemCount: (data['itemCount'] as num?)?.toInt() ?? 0,
       description: data['description'] ?? '',
     );
   }
@@ -239,7 +239,7 @@ class MenuType extends Equatable {
     return MenuType(
       id: doc.id,
       name: data['name'] ?? '',
-      displayOrder: data['displayOrder'] ?? 0,
+      displayOrder: (data['displayOrder'] as num?)?.toInt() ?? 0,
     );
   }
 }

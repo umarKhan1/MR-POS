@@ -25,10 +25,10 @@ class ReportsRepository {
 
     final List<RevenueReportRecord> records = [];
     final Map<OrderStatus, double> revenueByStatus = {
-      OrderStatus.awaited: 0,
-      OrderStatus.confirmed: 0,
-      OrderStatus.cancelled: 0,
-      OrderStatus.failed: 0,
+      OrderStatus.awaited: 0.0,
+      OrderStatus.confirmed: 0.0,
+      OrderStatus.cancelled: 0.0,
+      OrderStatus.failed: 0.0,
     };
 
     int sNoCounter = 1;

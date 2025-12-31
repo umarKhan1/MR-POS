@@ -54,10 +54,10 @@ class OrderItem {
   };
 
   factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-    menuItemId: json['menuItemId'],
-    name: json['name'],
-    quantity: json['quantity'],
-    price: json['price'],
+    menuItemId: json['menuItemId'] ?? '',
+    name: json['name'] ?? '',
+    quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+    price: (json['price'] as num?)?.toDouble() ?? 0.0,
   );
 }
 
@@ -133,8 +133,8 @@ class Order {
     items: (json['items'] as List)
         .map((item) => OrderItem.fromJson(item))
         .toList(),
-    tax: json['tax'] ?? 0.0,
-    charges: json['charges'] ?? 0.0,
+    tax: (json['tax'] as num?)?.toDouble() ?? 0.0,
+    charges: (json['charges'] as num?)?.toDouble() ?? 0.0,
   );
 
   factory Order.fromFirestore(dynamic doc) {
