@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/dashboard/presentation/cubit/dashboard_state.dart';
 import 'package:mrpos/features/dashboard/presentation/widgets/dish_item.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
@@ -46,24 +45,6 @@ class PopularDishesCard extends StatelessWidget {
                       desktop: 18.0,
                     ),
                     fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // TODO: Navigate to full list
-                },
-                child: Text(
-                  AppStrings.seeAll,
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                    fontSize: responsive.responsive(
-                      mobile: 13.0,
-                      tablet: 14.0,
-                      desktop: 14.0,
-                    ),
                   ),
                 ),
               ),

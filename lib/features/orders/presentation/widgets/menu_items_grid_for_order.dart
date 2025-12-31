@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_state.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_cubit.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
@@ -12,74 +14,86 @@ class MenuItemsGridForOrder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtils(context);
-    // Show ALL items, not just available ones
-    final allItems = MenuMockData.menuItems;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(
-            responsive.responsive(mobile: 16.0, tablet: 18.0, desktop: 20.0),
-          ),
-          child: Text(
-            'Special Menu For You',
-            style: TextStyle(
-              fontSize: responsive.responsive(
-                mobile: 18.0,
-                tablet: 19.0,
-                desktop: 20.0,
+    return BlocBuilder<MenuCubit, MenuState>(
+      builder: (context, state) {
+        if (state is! MenuLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final allItems = state.menuItems;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(
+                responsive.responsive(
+                  mobile: 16.0,
+                  tablet: 18.0,
+                  desktop: 20.0,
+                ),
               ),
-              fontWeight: FontWeight.w700,
-              color: context.isDarkMode ? Colors.white : Colors.black87,
+              child: Text(
+                'Special Menu For You',
+                style: TextStyle(
+                  fontSize: responsive.responsive(
+                    mobile: 18.0,
+                    tablet: 19.0,
+                    desktop: 20.0,
+                  ),
+                  fontWeight: FontWeight.w700,
+                  color: context.isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final availableWidth = constraints.maxWidth;
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final availableWidth = constraints.maxWidth;
 
-              // Determine columns based on AVAILABLE width, not screen width
-              int crossAxisCount = 1;
-              if (availableWidth > 800) {
-                crossAxisCount = 3;
-              } else if (availableWidth > 500) {
-                crossAxisCount = 2;
-              }
+                  // Determine columns based on AVAILABLE width, not screen width
+                  int crossAxisCount = 1;
+                  if (availableWidth > 800) {
+                    crossAxisCount = 3;
+                  } else if (availableWidth > 500) {
+                    crossAxisCount = 2;
+                  }
 
-              final spacing = responsive.responsive(
-                mobile: 12.0,
-                tablet: 16.0,
-                desktop: 20.0,
-              );
+                  final spacing = responsive.responsive(
+                    mobile: 12.0,
+                    tablet: 16.0,
+                    desktop: 20.0,
+                  );
 
-              // Calculate card width as a portion of available width minus total spacing gaps
-              final totalSpacing = spacing * (crossAxisCount + 1);
-              final cardWidth =
-                  (availableWidth - totalSpacing) / crossAxisCount;
+                  // Calculate card width as a portion of available width minus total spacing gaps
+                  final totalSpacing = spacing * (crossAxisCount + 1);
+                  final cardWidth =
+                      (availableWidth - totalSpacing) / crossAxisCount;
 
-              return SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  left: spacing,
-                  right: spacing,
-                  bottom: spacing,
-                ),
-                child: Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: allItems.map((item) {
-                    return SizedBox(
-                      width: cardWidth,
-                      child: _MenuItemCard(item: item),
-                    );
-                  }).toList(),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      left: spacing,
+                      right: spacing,
+                      bottom: spacing,
+                    ),
+                    child: Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: allItems.map((item) {
+                        return SizedBox(
+                          width: cardWidth,
+                          child: _MenuItemCard(item: item),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

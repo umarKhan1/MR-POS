@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 
 /// Helper class for menu item operations
@@ -10,9 +10,11 @@ class MenuItemHelper {
     MenuItem item,
     MenuCubit cubit,
   ) {
-    // Import moved to avoid circular dependency
-    // This will be imported in the screen file
-    throw UnimplementedError('Import AddMenuItemModal in screen file');
+    // This helper seems to be a placeholder or legacy from mock setup.
+    // In the new Firestore implementation, we handle screen transitions directly in the Screen or Widget.
+    throw UnimplementedError(
+      'Handle edit modal in the UI layer (MenuScreen/MenuItemCard)',
+    );
   }
 
   /// Shows delete confirmation dialog and handles deletion
@@ -42,38 +44,15 @@ class MenuItemHelper {
     );
   }
 
-  /// Deletes a menu item and updates category count
+  /// Deletes a menu item from Firestore
   static void _deleteMenuItem(
     BuildContext context,
     BuildContext dialogContext,
     MenuItem item,
     MenuCubit cubit,
   ) {
-    // Delete the item
-    MenuMockData.menuItems.removeWhere((i) => i.id == item.id);
-
-    // Update category item count
-    final category = MenuMockData.categories.firstWhere(
-      (cat) => cat.name == item.category,
-      orElse: () => MenuMockData.categories.first,
-    );
-    final categoryIndex = MenuMockData.categories.indexWhere(
-      (cat) => cat.id == category.id,
-    );
-    if (categoryIndex != -1 && category.itemCount > 0) {
-      MenuMockData.categories[categoryIndex] = MenuCategory(
-        id: category.id,
-        name: category.name,
-        iconAsset: category.iconAsset,
-        iconData: category.iconData,
-        itemCount: category.itemCount - 1,
-        iconKey: category.iconKey,
-        description: category.description,
-      );
-    }
-
-    // Refresh UI
-    cubit.refresh();
+    // Delete from Firestore
+    cubit.deleteMenuItem(item.id);
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(

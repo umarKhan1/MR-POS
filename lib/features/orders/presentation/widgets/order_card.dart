@@ -30,7 +30,7 @@ class OrderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
-        border: order.status == OrderStatus.inProcess
+        border: order.status == OrderStatus.awaited
             ? Border.all(
                 color: AppColors.primaryRed.withValues(alpha: 0.5),
                 width: 2,
@@ -349,9 +349,8 @@ class OrderCard extends StatelessWidget {
             ],
           ),
           responsive.responsive(mobile: 6.h, tablet: 7.h, desktop: 8.h),
-          // Action buttons - only show for active orders (not completed or cancelled)
-          if (order.status != OrderStatus.completed &&
-              order.status != OrderStatus.cancelled) ...[
+          // Action buttons - only show for active orders (awaited)
+          if (order.status == OrderStatus.awaited) ...[
             Row(
               children: [
                 _buildActionButton(
@@ -495,27 +494,27 @@ class OrderCard extends StatelessWidget {
 
   Color _getStatusColor() {
     switch (order.status) {
-      case OrderStatus.ready:
-        return const Color(0xFF4CAF50);
-      case OrderStatus.inProcess:
-        return AppColors.primaryRed;
-      case OrderStatus.completed:
-        return const Color(0xFF2196F3);
+      case OrderStatus.confirmed:
+        return const Color(0xFFD32F2F); // Strong Red
+      case OrderStatus.awaited:
+        return const Color(0xFFE57373); // Coral/Pink
       case OrderStatus.cancelled:
-        return const Color(0xFFF44336);
+        return const Color(0xFFEF9A9A); // Light Coral
+      case OrderStatus.failed:
+        return const Color(0xFFFFCDD2); // Very Light Pink
     }
   }
 
   IconData _getStatusIcon() {
     switch (order.status) {
-      case OrderStatus.ready:
+      case OrderStatus.confirmed:
         return Icons.check_circle;
-      case OrderStatus.inProcess:
+      case OrderStatus.awaited:
         return Icons.access_time;
-      case OrderStatus.completed:
-        return Icons.check_circle;
       case OrderStatus.cancelled:
         return Icons.cancel;
+      case OrderStatus.failed:
+        return Icons.error_outline;
     }
   }
 
@@ -553,14 +552,14 @@ class OrderCard extends StatelessWidget {
     // Get status detail options based on current order status
     List<String> statusDetails = [];
     switch (order.status) {
-      case OrderStatus.ready:
-        statusDetails = ['Ready to serve', 'Waiting for pickup'];
+      case OrderStatus.confirmed:
+        statusDetails = ['Confirmed', 'Ready to serve', 'Served'];
         break;
-      case OrderStatus.inProcess:
-        statusDetails = ['Cooking Now', 'In the kitchen', 'Preparing'];
+      case OrderStatus.awaited:
+        statusDetails = ['Awaited', 'In the kitchen', 'Preparing'];
         break;
-      case OrderStatus.completed:
-        statusDetails = ['Delivered', 'Picked up', 'Served'];
+      case OrderStatus.failed:
+        statusDetails = ['Failed', 'Payment Failed', 'System Error'];
         break;
       case OrderStatus.cancelled:
         statusDetails = ['Cancelled', 'Refunded'];

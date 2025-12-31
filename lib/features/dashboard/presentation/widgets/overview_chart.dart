@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:mrpos/features/dashboard/presentation/cubit/dashboard_state.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
@@ -24,36 +27,44 @@ class _OverviewChartState extends State<OverviewChart> {
     final isDark = context.isDarkMode;
     final responsive = ResponsiveUtils(context);
 
-    return Container(
-      padding: EdgeInsets.all(responsive.cardPadding),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      builder: (context, state) {
+        if (state is! DashboardLoaded) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          padding: EdgeInsets.all(responsive.cardPadding),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(isDark, responsive),
-          responsive.isMobile ? 16.h : 24.h,
-          _buildLegend(isDark, responsive),
-          responsive.isMobile ? 16.h : 24.h,
-          SizedBox(
-            height: responsive.responsive(
-              mobile: 200.0,
-              tablet: 250.0,
-              desktop: 300.0,
-            ),
-            child: _buildChart(isDark, responsive),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(isDark, responsive),
+              responsive.isMobile ? 16.h : 24.h,
+              _buildLegend(isDark, responsive),
+              responsive.isMobile ? 16.h : 24.h,
+              SizedBox(
+                height: responsive.responsive(
+                  mobile: 200.0,
+                  tablet: 250.0,
+                  desktop: 300.0,
+                ),
+                child: _buildChart(isDark, responsive, state),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -214,13 +225,29 @@ class _OverviewChartState extends State<OverviewChart> {
     );
   }
 
-  Widget _buildChart(bool isDark, ResponsiveUtils responsive) {
+  Widget _buildChart(
+    bool isDark,
+    ResponsiveUtils responsive,
+    DashboardLoaded state,
+  ) {
+    final salesData = selectedFilter == TimeFilter.monthly
+        ? state.monthlySalesChart
+        : state.dailySalesChart;
+    final revenueData = selectedFilter == TimeFilter.monthly
+        ? state.monthlyRevenueChart
+        : state.dailyRevenueChart;
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: 1000,
+          horizontalInterval: salesData.isEmpty
+              ? 1000
+              : (salesData.reduce((a, b) => a > b ? a : b) / 5).clamp(
+                  100,
+                  1000,
+                ),
           getDrawingHorizontalLine: (value) {
             return FlLine(
               color: isDark
@@ -244,37 +271,53 @@ class _OverviewChartState extends State<OverviewChart> {
               reservedSize: responsive.isMobile ? 25 : 30,
               interval: 1,
               getTitlesWidget: (value, meta) {
-                if (value.toInt() >= 0 &&
-                    value.toInt() < MockData.chartData.length) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      MockData.chartData[value.toInt()].month,
-                      style: TextStyle(
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondaryLight,
-                        fontSize: responsive.responsive(
-                          mobile: 10.0,
-                          tablet: 12.0,
-                          desktop: 12.0,
-                        ),
+                final index = value.toInt();
+                if (index < 0 || index >= salesData.length)
+                  return const SizedBox();
+
+                String label = '';
+                final now = DateTime.now();
+                if (selectedFilter == TimeFilter.monthly) {
+                  final monthDate = DateTime(
+                    now.year,
+                    now.month - (6 - index),
+                    1,
+                  );
+                  label = DateFormat('MMM').format(monthDate);
+                } else {
+                  final dayDate = now.subtract(Duration(days: 6 - index));
+                  label = DateFormat('E').format(dayDate);
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                      fontSize: responsive.responsive(
+                        mobile: 10.0,
+                        tablet: 12.0,
+                        desktop: 12.0,
                       ),
                     ),
-                  );
-                }
-                return const SizedBox();
+                  ),
+                );
               },
             ),
           ),
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1000,
               reservedSize: responsive.isMobile ? 35 : 42,
               getTitlesWidget: (value, meta) {
+                if (value == 0) return const SizedBox();
                 return Text(
-                  '${(value / 1000).toInt()}k',
+                  value >= 1000
+                      ? '${(value / 1000).toStringAsFixed(1)}k'
+                      : value.toStringAsFixed(0),
                   style: TextStyle(
                     color: isDark
                         ? AppColors.textSecondaryDark
@@ -292,36 +335,44 @@ class _OverviewChartState extends State<OverviewChart> {
         ),
         borderData: FlBorderData(show: false),
         minX: 0,
-        maxX: (MockData.chartData.length - 1).toDouble(),
+        maxX: (salesData.length - 1).toDouble(),
         minY: 0,
-        maxY: 6000,
+        maxY: salesData.isEmpty
+            ? 1000
+            : (salesData.reduce((a, b) => a > b ? a : b) * 1.2).clamp(
+                100,
+                double.infinity,
+              ),
         lineBarsData: [
           // Sales line
           LineChartBarData(
-            spots: MockData.chartData
+            spots: salesData
                 .asMap()
                 .entries
-                .map((e) => FlSpot(e.key.toDouble(), e.value.sales))
+                .map((e) => FlSpot(e.key.toDouble(), e.value))
                 .toList(),
             isCurved: true,
             color: AppColors.primaryRed,
             barWidth: 3,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(show: false),
+            dotData: const FlDotData(show: true),
+            belowBarData: BarAreaData(
+              show: true,
+              color: AppColors.primaryRed.withValues(alpha: 0.1),
+            ),
           ),
           // Revenue line
           LineChartBarData(
-            spots: MockData.chartData
+            spots: revenueData
                 .asMap()
                 .entries
-                .map((e) => FlSpot(e.key.toDouble(), e.value.revenue))
+                .map((e) => FlSpot(e.key.toDouble(), e.value))
                 .toList(),
             isCurved: true,
             color: AppColors.grey,
-            barWidth: 3,
+            barWidth: 2,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
+            dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(show: false),
           ),
         ],

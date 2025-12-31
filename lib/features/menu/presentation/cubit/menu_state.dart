@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 
 abstract class MenuState extends Equatable {
   const MenuState();
@@ -10,13 +10,16 @@ abstract class MenuState extends Equatable {
 
 class MenuInitial extends MenuState {}
 
+class MenuLoading extends MenuState {}
+
 class MenuLoaded extends MenuState {
   final String selectedCategoryId;
-  final String selectedMenuType; // Changed from selectedTabIndex
+  final String selectedMenuType;
   final Set<String> selectedItemIds;
   final DateTime lastUpdated;
   final List<MenuItem> menuItems;
   final List<MenuCategory> categories;
+  final List<MenuType> menuTypes;
 
   const MenuLoaded({
     required this.selectedCategoryId,
@@ -25,6 +28,7 @@ class MenuLoaded extends MenuState {
     required this.lastUpdated,
     required this.menuItems,
     required this.categories,
+    required this.menuTypes,
   });
 
   MenuLoaded copyWith({
@@ -34,6 +38,7 @@ class MenuLoaded extends MenuState {
     DateTime? lastUpdated,
     List<MenuItem>? menuItems,
     List<MenuCategory>? categories,
+    List<MenuType>? menuTypes,
   }) {
     return MenuLoaded(
       selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
@@ -42,6 +47,7 @@ class MenuLoaded extends MenuState {
       lastUpdated: lastUpdated ?? this.lastUpdated,
       menuItems: menuItems ?? this.menuItems,
       categories: categories ?? this.categories,
+      menuTypes: menuTypes ?? this.menuTypes,
     );
   }
 
@@ -53,5 +59,15 @@ class MenuLoaded extends MenuState {
     lastUpdated,
     menuItems,
     categories,
+    menuTypes,
   ];
+}
+
+class MenuError extends MenuState {
+  final String message;
+
+  const MenuError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:mrpos/core/models/order.dart';
 import 'package:mrpos/features/reports/domain/models/revenue_report_models.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
@@ -135,9 +136,21 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: widget.data.monthlyTrend.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), e.value.revenue);
-                    }).toList(),
+                    spots: () {
+                      final statusMap = {
+                        'Confirmed': OrderStatus.confirmed,
+                        'Awaited': OrderStatus.awaited,
+                        'Cancelled': OrderStatus.cancelled,
+                        'Failed': OrderStatus.failed,
+                      };
+                      final selectedStatus = statusMap[_activeTab]!;
+                      final trendData =
+                          widget.data.trendsByStatus[selectedStatus] ?? [];
+
+                      return trendData.asMap().entries.map((e) {
+                        return FlSpot(e.key.toDouble(), e.value.revenue);
+                      }).toList();
+                    }(),
                     isCurved: true,
                     curveSmoothness: 0.35,
                     color: AppColors.primaryRed,
@@ -166,9 +179,21 @@ class _RevenueLineChartState extends State<RevenueLineChart> {
                     ),
                   ),
                   LineChartBarData(
-                    spots: widget.data.monthlyTrend.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), e.value.revenue * 0.65);
-                    }).toList(),
+                    spots: () {
+                      final statusMap = {
+                        'Confirmed': OrderStatus.confirmed,
+                        'Awaited': OrderStatus.awaited,
+                        'Cancelled': OrderStatus.cancelled,
+                        'Failed': OrderStatus.failed,
+                      };
+                      final selectedStatus = statusMap[_activeTab]!;
+                      final trendData =
+                          widget.data.trendsByStatus[selectedStatus] ?? [];
+
+                      return trendData.asMap().entries.map((e) {
+                        return FlSpot(e.key.toDouble(), e.value.revenue * 0.65);
+                      }).toList();
+                    }(),
                     isCurved: true,
                     curveSmoothness: 0.15,
                     color: textColor.withValues(alpha: 0.15),

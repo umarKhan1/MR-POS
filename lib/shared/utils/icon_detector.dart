@@ -109,4 +109,34 @@ class IconDetector {
 
     return 'default';
   }
+
+  /// Gets the appropriate icon based on the icon key
+  static IconData getIcon(String key) {
+    switch (key) {
+      case 'pizza':
+        return FontAwesomeIcons.pizzaSlice;
+      case 'burger':
+        return FontAwesomeIcons.burger;
+      case 'chicken':
+        return FontAwesomeIcons.drumstickBite;
+      case 'seafood':
+        return FontAwesomeIcons.fish;
+      case 'bakery':
+        return FontAwesomeIcons.breadSlice;
+      case 'beverage':
+        return FontAwesomeIcons.wineGlass;
+      case 'dessert':
+        return FontAwesomeIcons.iceCream;
+      case 'salad':
+        return FontAwesomeIcons.leaf;
+      case 'pasta':
+        return FontAwesomeIcons.bowlFood;
+      case 'coffee':
+        return FontAwesomeIcons.mugHot;
+      case 'steak':
+        return FontAwesomeIcons.bacon;
+      default:
+        return FontAwesomeIcons.utensils;
+    }
+  }
 }

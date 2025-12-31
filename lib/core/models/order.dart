@@ -1,32 +1,32 @@
 enum OrderStatus {
-  ready,
-  inProcess,
-  completed,
-  cancelled;
+  awaited,
+  confirmed,
+  cancelled,
+  failed;
 
   String get displayName {
     switch (this) {
-      case OrderStatus.ready:
-        return 'Ready';
-      case OrderStatus.inProcess:
-        return 'In Process';
-      case OrderStatus.completed:
-        return 'Completed';
+      case OrderStatus.awaited:
+        return 'Awaited';
+      case OrderStatus.confirmed:
+        return 'Confirmed';
       case OrderStatus.cancelled:
         return 'Cancelled';
+      case OrderStatus.failed:
+        return 'Failed';
     }
   }
 
   String get color {
     switch (this) {
-      case OrderStatus.ready:
-        return '0xFF4CAF50'; // Green
-      case OrderStatus.inProcess:
-        return '0xFFFFB3C1'; // Pink
-      case OrderStatus.completed:
-        return '0xFF2196F3'; // Blue
+      case OrderStatus.awaited:
+        return '0xFFE57373'; // Light Red/Coral
+      case OrderStatus.confirmed:
+        return '0xFFD32F2F'; // Strong Red
       case OrderStatus.cancelled:
-        return '0xFFF44336'; // Red
+        return '0xFFEF9A9A'; // Soft Pink/Red
+      case OrderStatus.failed:
+        return '0xFFFFCDD2'; // Very Light Pink
     }
   }
 }
@@ -136,4 +136,48 @@ class Order {
     tax: json['tax'] ?? 0.0,
     charges: json['charges'] ?? 0.0,
   );
+
+  factory Order.fromFirestore(dynamic doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    final rawDate = data['orderDate'];
+    DateTime date;
+    try {
+      if (rawDate is String) {
+        date = DateTime.parse(rawDate);
+      } else if (rawDate != null) {
+        try {
+          date = (rawDate as dynamic).toDate();
+        } catch (_) {
+          if (rawDate is DateTime) {
+            date = rawDate;
+          } else {
+            date = DateTime.tryParse(rawDate.toString()) ?? DateTime.now();
+          }
+        }
+      } else {
+        date = DateTime.now();
+      }
+    } catch (_) {
+      date = DateTime.now();
+    }
+
+    return Order(
+      id: doc.id,
+      orderNumber: data['orderNumber'] ?? '',
+      customerName: data['customerName'] ?? '',
+      orderDate: date,
+      status: OrderStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+        orElse: () => OrderStatus.awaited,
+      ),
+      statusDetail: data['statusDetail'] ?? '',
+      items:
+          (data['items'] as List?)
+              ?.map((item) => OrderItem.fromJson(item))
+              .toList() ??
+          [],
+      tax: (data['tax'] as num?)?.toDouble() ?? 0.0,
+      charges: (data['charges'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
 }

@@ -80,6 +80,13 @@ dependencies:
   excel: ^4.0.6
   open_filex: ^4.7.0
 
+  # Firebase
+  firebase_core: ^3.10.1
+  firebase_auth: ^5.4.1
+  firebase_storage: ^12.4.10
+  cloud_firestore: ^5.6.1
+  shimmer: ^3.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -94,6 +101,7 @@ dev_dependencies:
   # Testing
   bloc_test: ^9.1.7
   mocktail: ^1.0.4
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

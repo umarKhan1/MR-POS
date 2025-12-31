@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 import 'package:mrpos/core/router/route_names.dart';
 import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 import 'package:mrpos/features/menu/presentation/widgets/menu_header.dart';
@@ -19,10 +19,7 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MenuCubit(),
-      child: const _MenuScreenContent(),
-    );
+    return const _MenuScreenContent();
   }
 }
 
@@ -30,8 +27,6 @@ class _MenuScreenContent extends StatelessWidget {
   const _MenuScreenContent();
 
   void _showEditModal(BuildContext context, MenuItem item) {
-    final cubit = context.read<MenuCubit>();
-
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -39,10 +34,7 @@ class _MenuScreenContent extends StatelessWidget {
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return AddMenuItemModal(
-          itemToEdit: item,
-          onSaved: () => cubit.refresh(),
-        );
+        return AddMenuItemModal(itemToEdit: item);
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
@@ -84,30 +76,7 @@ class _MenuScreenContent extends StatelessWidget {
     MenuItem item,
     MenuCubit cubit,
   ) {
-    // Delete the item
-    MenuMockData.menuItems.removeWhere((i) => i.id == item.id);
-
-    // Update category item count
-    final category = MenuMockData.categories.firstWhere(
-      (cat) => cat.name == item.category,
-      orElse: () => MenuMockData.categories.first,
-    );
-    final categoryIndex = MenuMockData.categories.indexWhere(
-      (cat) => cat.id == category.id,
-    );
-    if (categoryIndex != -1 && category.itemCount > 0) {
-      MenuMockData.categories[categoryIndex] = MenuCategory(
-        id: category.id,
-        name: category.name,
-        iconAsset: category.iconAsset,
-        iconData: category.iconData,
-        itemCount: category.itemCount - 1,
-        iconKey: category.iconKey,
-        description: category.description,
-      );
-    }
-
-    cubit.refresh();
+    cubit.deleteMenuItem(item.id);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

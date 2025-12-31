@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mrpos/features/menu/data/repositories/firestore_menu_repository.dart';
+import 'package:mrpos/features/orders/data/repositories/orders_repository.dart';
+import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
+import 'package:mrpos/features/orders/presentation/cubit/orders_state.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_cubit.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_state.dart';
 import 'package:mrpos/features/orders/presentation/widgets/menu_items_grid_for_order.dart';
@@ -18,7 +22,24 @@ class CreateOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CreateOrderCubit()..loadOrderForEdit(orderId),
+      create: (context) {
+        final cubit = CreateOrderCubit(
+          ordersRepository: OrdersRepository(),
+          menuRepository: FirestoreMenuRepository(),
+        );
+
+        if (orderId != null) {
+          final ordersState = context.read<OrdersCubit>().state;
+          if (ordersState is OrdersLoaded) {
+            final order = ordersState.orders.firstWhere(
+              (o) => o.id == orderId,
+              orElse: () => ordersState.orders.first,
+            );
+            cubit.loadOrderForEdit(order);
+          }
+        }
+        return cubit;
+      },
       child: _CreateOrderContent(orderId: orderId),
     );
   }
@@ -89,7 +110,14 @@ class _CreateOrderContentState extends State<_CreateOrderContent> {
                         Icons.arrow_back,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
-                      onPressed: () => GoRouter.of(context).pop(),
+                      onPressed: () {
+                        if (GoRouter.of(context).canPop()) {
+                          GoRouter.of(context).pop();
+                        } else {
+                          // Fallback to home or dashboard if cannot pop
+                          context.go('/');
+                        }
+                      },
                       tooltip: 'Back',
                     ),
                     responsive.responsive(

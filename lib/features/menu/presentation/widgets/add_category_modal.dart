@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/icon_detector.dart';
 import 'package:mrpos/shared/widgets/custom_button.dart';
-import 'package:mrpos/shared/widgets/custom_dropdown.dart';
 import 'package:mrpos/shared/widgets/custom_form_field.dart';
 
 class AddCategoryModal extends StatefulWidget {
-  const AddCategoryModal({super.key});
+  final MenuCategory? category;
+  const AddCategoryModal({super.key, this.category});
 
   @override
   State<AddCategoryModal> createState() => _AddCategoryModalState();
@@ -21,6 +23,18 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   IconData _previewIcon = FontAwesomeIcons.utensils;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final category = widget.category;
+    if (category != null) {
+      _nameController.text = category.name;
+      _descriptionController.text = category.description ?? '';
+      _previewIcon = IconDetector.detectIcon(category.name);
+    }
+  }
 
   @override
   void dispose() {
@@ -35,60 +49,64 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
     });
   }
 
-  bool _isDuplicateCategory(String name) {
-    return MenuMockData.categories.any(
-      (cat) => cat.name.toLowerCase() == name.toLowerCase().trim(),
-    );
-  }
-
-  void _saveCategory() {
+  Future<void> _saveCategory() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       final categoryName = _nameController.text.trim();
-
-      // Check for duplicates
-      if (_isDuplicateCategory(categoryName)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Category "$categoryName" already exists!'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        return;
-      }
-
-      // Generate new category ID
-      final newId = 'cat_${DateTime.now().millisecondsSinceEpoch}';
       final iconKey = IconDetector.getIconKey(categoryName);
+      final cubit = context.read<MenuCubit>();
 
-      // Create new category
-      final newCategory = MenuCategory(
-        id: newId,
-        name: categoryName,
-        iconKey: iconKey,
-        itemCount: 0,
-        description: _descriptionController.text.trim(),
-        iconData: IconDetector.detectIcon(categoryName),
-      );
+      try {
+        if (widget.category != null) {
+          // Update existing category
+          final updatedCategory = widget.category!.copyWith(
+            name: categoryName,
+            iconKey: iconKey,
+            description: _descriptionController.text.trim(),
+          );
+          await cubit.updateCategory(updatedCategory);
+        } else {
+          // Create new category
+          final newCategory = MenuCategory(
+            id: '', // Firestore will generate the ID
+            name: categoryName,
+            iconKey: iconKey,
+            itemCount: 0,
+            description: _descriptionController.text.trim(),
+          );
+          await cubit.addCategory(newCategory);
+        }
 
-      // Add to mock data
-      MenuMockData.categories.add(newCategory);
+        if (mounted) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Category "$categoryName" ${widget.category != null ? 'updated' : 'added'} successfully!',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
 
-      // Show success message with icon info
-      final hasIcon = iconKey != 'default';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            hasIcon
-                ? 'Category "$categoryName" created with ${iconKey} icon!'
-                : 'Category "$categoryName" created with default icon!',
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 3),
-        ),
-      );
-
-      // Close modal
-      Navigator.of(context).pop();
+          // Close modal
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to ${widget.category != null ? 'update' : 'add'} category: ${e.toString()}',
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -132,7 +150,9 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      AppStrings.addNewCategory,
+                      widget.category != null
+                          ? 'Edit Category'
+                          : AppStrings.addNewCategory,
                       style: context.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -209,8 +229,6 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                         ),
                         16.h,
 
-                        16.h,
-
                         // Description
                         CustomFormField(
                           controller: _descriptionController,
@@ -238,8 +256,11 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                             ),
                             16.w,
                             CustomButton.primary(
-                              text: 'Save',
-                              onPressed: _saveCategory,
+                              text: widget.category != null ? 'Update' : 'Save',
+                              isLoading: _isLoading,
+                              onPressed: () {
+                                _saveCategory();
+                              },
                               height: 40,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 32,

@@ -1,97 +1,109 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
-import 'package:mrpos/core/constants/orders_mock_data.dart';
 import 'package:mrpos/core/models/order.dart';
+import 'package:mrpos/features/orders/domain/repositories/orders_repository.dart';
+import 'package:mrpos/features/menu/domain/repositories/menu_repository.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 import 'package:mrpos/features/reports/domain/models/revenue_report_models.dart';
 import 'package:intl/intl.dart';
 
 class ReportsRepository {
-  Future<RevenueReportData> getRevenueReport(DateTimeRange range) async {
-    // Filter orders by date range (ignoring time)
-    final filteredOrders = OrdersMockData.orders.where((order) {
-      final orderDate = DateTime(
-        order.orderDate.year,
-        order.orderDate.month,
-        order.orderDate.day,
-      );
-      final startDate = DateTime(
-        range.start.year,
-        range.start.month,
-        range.start.day,
-      );
-      final endDate = DateTime(range.end.year, range.end.month, range.end.day);
+  final IOrdersRepository _ordersRepository;
+  final MenuRepository _menuRepository;
 
-      return (orderDate.isAtSameMomentAs(startDate) ||
-              orderDate.isAfter(startDate)) &&
-          (orderDate.isAtSameMomentAs(endDate) || orderDate.isBefore(endDate));
-    }).toList();
+  ReportsRepository(this._ordersRepository, this._menuRepository);
+
+  Future<RevenueReportData> getRevenueReport(DateTimeRange range) async {
+    // 1. Fetch orders from repository
+    final filteredOrders = await _ordersRepository.getOrdersByDateRange(
+      range.start,
+      range.end,
+    );
+
+    // 2. Fetch all menu items to get cost prices
+    final List<MenuItem> menuItems = await _menuRepository.getMenuItems().first;
 
     final List<RevenueReportRecord> records = [];
     final Map<OrderStatus, double> revenueByStatus = {
-      OrderStatus.ready: 0,
-      OrderStatus.inProcess: 0,
-      OrderStatus.completed: 0,
+      OrderStatus.awaited: 0,
+      OrderStatus.confirmed: 0,
       OrderStatus.cancelled: 0,
+      OrderStatus.failed: 0,
     };
 
     int sNoCounter = 1;
 
     for (final order in filteredOrders) {
-      // Add to status breakdown
+      // Add to status breakdown (All orders counted for breakdown)
       revenueByStatus[order.status] =
           (revenueByStatus[order.status] ?? 0) + order.total;
 
-      // Create individual records for the table
-      for (final item in order.items) {
-        // Look up menu item for cost price
-        final menuItem = MenuMockData.menuItems.firstWhere(
-          (m) => m.id == item.menuItemId,
-          orElse: () => MenuItem(
-            id: '',
-            name: item.name,
-            description: '',
-            itemId: '',
-            image: '',
-            quantity: 0,
-            stockStatus: '',
-            isPerishable: false,
-            category: '',
-            price: item.price,
-            costPrice: item.price * 0.6, // Fallback cost
-            isAvailable: true,
-            menuType: '',
-          ),
-        );
+      // Only add CONFIRMED orders to the detailed records table and total revenue
+      if (order.status == OrderStatus.confirmed) {
+        for (final item in order.items) {
+          // Find cost price from menu items
+          final menuItem = menuItems
+              .where((m) => m.id == item.menuItemId)
+              .firstOrNull;
+          final costPrice =
+              menuItem?.costPrice ??
+              (item.price * 0.7); // Fallback to 70% if unknown
 
-        records.add(
-          RevenueReportRecord(
-            sNo: sNoCounter.toString().padLeft(2, '0'),
-            foodName: item.name,
-            date: order.orderDate,
-            sellPrice: item.price,
-            costPrice: menuItem.costPrice,
-            quantity: item.quantity,
-          ),
-        );
-        sNoCounter++;
+          records.add(
+            RevenueReportRecord(
+              sNo: sNoCounter.toString().padLeft(2, '0'),
+              foodName: item.name,
+              date: order.orderDate,
+              sellPrice: item.price,
+              costPrice: costPrice,
+              quantity: item.quantity,
+            ),
+          );
+          sNoCounter++;
+        }
       }
     }
 
-    // Calculate monthly trend (last 12 months)
-    final List<MonthlyRevenue> monthlyTrend = _calculateMonthlyTrend(
-      filteredOrders,
-    );
+    // Calculate monthly trends for ALL statuses
+    final Map<OrderStatus, List<MonthlyRevenue>> trendsByStatus = {
+      OrderStatus.awaited: _calculateMonthlyTrend(
+        filteredOrders,
+        OrderStatus.awaited,
+      ),
+      OrderStatus.confirmed: _calculateMonthlyTrend(
+        filteredOrders,
+        OrderStatus.confirmed,
+      ),
+      OrderStatus.cancelled: _calculateMonthlyTrend(
+        filteredOrders,
+        OrderStatus.cancelled,
+      ),
+      OrderStatus.failed: _calculateMonthlyTrend(
+        filteredOrders,
+        OrderStatus.failed,
+      ),
+    };
+
+    // Gross revenue (including tax/charges) for Confirmed orders
+    final double totalOrdersRevenue = filteredOrders
+        .where((o) => o.status == OrderStatus.confirmed)
+        .fold(0, (sum, order) => sum + order.total);
 
     return RevenueReportData(
       records: records,
       revenueByStatus: revenueByStatus,
-      monthlyTrend: monthlyTrend,
+      monthlyTrend: trendsByStatus[OrderStatus.confirmed]!,
+      trendsByStatus: trendsByStatus,
+      totalOrdersRevenue: totalOrdersRevenue,
     );
   }
 
-  List<MonthlyRevenue> _calculateMonthlyTrend(List<Order> orders) {
+  List<MonthlyRevenue> _calculateMonthlyTrend(
+    List<Order> orders,
+    OrderStatus status,
+  ) {
     final Map<String, double> monthlyData = {};
-    final months = [
+    const months = [
       'Jan',
       'Feb',
       'Mar',
@@ -111,16 +123,22 @@ class ReportsRepository {
       monthlyData[month] = 0.0;
     }
 
-    // Sum revenue by month
+    // Sum revenue by month for the specific status
     for (final order in orders) {
-      final monthName = DateFormat('MMM').format(order.orderDate);
-      if (monthlyData.containsKey(monthName)) {
-        monthlyData[monthName] = monthlyData[monthName]! + order.total;
+      if (order.status == status) {
+        final monthName = DateFormat('MMM').format(order.orderDate);
+        if (monthlyData.containsKey(monthName)) {
+          monthlyData[monthName] = monthlyData[monthName]! + order.total;
+        }
       }
     }
 
     return months
         .map((m) => MonthlyRevenue(month: m, revenue: monthlyData[m]!))
         .toList();
+  }
+
+  Stream<List<Order>> getOrdersStream() {
+    return _ordersRepository.getOrders();
   }
 }

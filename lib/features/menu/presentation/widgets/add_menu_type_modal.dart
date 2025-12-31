@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/menu_type.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/widgets/custom_button.dart';
@@ -19,11 +19,11 @@ class AddMenuTypeModal extends StatefulWidget {
 class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // If editing, pre-fill the form
     if (widget.menuTypeToEdit != null) {
       _nameController.text = widget.menuTypeToEdit!.name;
     }
@@ -35,67 +35,53 @@ class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
     super.dispose();
   }
 
-  bool _isDuplicateMenuType(String name) {
-    return MenuMockData.menuTypes.any(
-      (type) =>
-          type.name.toLowerCase() == name.toLowerCase().trim() &&
-          type.id != widget.menuTypeToEdit?.id,
-    );
-  }
-
-  void _saveMenuType() {
+  Future<void> _saveMenuType() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       final menuTypeName = _nameController.text.trim();
+      final cubit = context.read<MenuCubit>();
 
-      // Check for duplicates
-      if (_isDuplicateMenuType(menuTypeName)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Menu type "$menuTypeName" already exists!'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        return;
-      }
-
-      if (widget.menuTypeToEdit != null) {
-        // EDIT MODE
-        final index = MenuMockData.menuTypes.indexWhere(
-          (type) => type.id == widget.menuTypeToEdit!.id,
-        );
-        if (index != -1) {
-          MenuMockData.menuTypes[index] = MenuType(
-            id: widget.menuTypeToEdit!.id,
+      try {
+        if (widget.menuTypeToEdit != null) {
+          // EDIT MODE
+          final updatedType = widget.menuTypeToEdit!.copyWith(
             name: menuTypeName,
-            displayOrder: widget.menuTypeToEdit!.displayOrder,
+          );
+          await cubit.updateMenuType(updatedType);
+        } else {
+          // ADD MODE
+          final newMenuType = MenuType(
+            id: '', // Firestore will generate the ID
+            name: menuTypeName,
+            displayOrder: 0, // Simplified for now, or get from state
+          );
+          await cubit.addMenuType(newMenuType);
+        }
+
+        if (mounted) {
+          final action = widget.menuTypeToEdit != null ? 'updated' : 'added';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Menu type "$menuTypeName" $action successfully!'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          Navigator.of(context).pop(true);
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to save menu type: ${e.toString()}'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
+            ),
           );
         }
-      } else {
-        // ADD MODE
-        final newId = 'menutype_${DateTime.now().millisecondsSinceEpoch}';
-        final newDisplayOrder = MenuMockData.menuTypes.length + 1;
-
-        final newMenuType = MenuType(
-          id: newId,
-          name: menuTypeName,
-          displayOrder: newDisplayOrder,
-        );
-
-        MenuMockData.menuTypes.add(newMenuType);
       }
-
-      // Show success message
-      final action = widget.menuTypeToEdit != null ? 'updated' : 'added';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Menu type "$menuTypeName" $action successfully!'),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-
-      // Close modal and trigger refresh
-      Navigator.of(context).pop(true); // Return true to indicate success
     }
   }
 
@@ -165,7 +151,6 @@ class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Menu Type Name
                         CustomFormField(
                           controller: _nameController,
                           label: 'Menu Type Name',
@@ -182,7 +167,6 @@ class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
                         ),
                         24.h,
 
-                        // Info text
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -216,7 +200,6 @@ class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
                         ),
                         32.h,
 
-                        // Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -234,7 +217,10 @@ class _AddMenuTypeModalState extends State<AddMenuTypeModal> {
                             16.w,
                             CustomButton.primary(
                               text: isEditing ? 'Update' : 'Save',
-                              onPressed: _saveMenuType,
+                              isLoading: _isLoading,
+                              onPressed: () {
+                                _saveMenuType();
+                              },
                               height: 40,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 32,

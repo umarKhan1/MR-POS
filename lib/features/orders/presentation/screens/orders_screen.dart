@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_state.dart';
 import 'package:mrpos/features/orders/presentation/widgets/orders_header.dart';
 import 'package:mrpos/features/orders/presentation/widgets/order_filter_tabs.dart';
 import 'package:mrpos/features/orders/presentation/widgets/order_card.dart';
+import 'package:mrpos/features/orders/presentation/widgets/orders_shimmer.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
 
@@ -33,11 +33,7 @@ class OrdersScreen extends StatelessWidget {
                 BlocBuilder<OrdersCubit, OrdersState>(
                   builder: (context, state) {
                     if (state is OrdersLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primaryRed,
-                        ),
-                      );
+                      return const OrdersShimmer();
                     }
 
                     if (state is OrdersError) {
@@ -53,15 +49,39 @@ class OrdersScreen extends StatelessWidget {
                       if (state.filteredOrders.isEmpty) {
                         return Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(48),
-                            child: Text(
-                              'No orders found',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.5)
-                                    : Colors.black.withValues(alpha: 0.5),
-                                fontSize: 16,
-                              ),
+                            padding: const EdgeInsets.symmetric(vertical: 80),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.receipt_long_outlined,
+                                  size: 64,
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.2)
+                                      : Colors.black.withOpacity(0.1),
+                                ),
+                                16.h,
+                                Text(
+                                  'Ready for your next order!',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.black54,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                8.h,
+                                Text(
+                                  'New orders will appear here in real-time.',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white38
+                                        : Colors.black38,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );

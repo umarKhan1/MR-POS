@@ -15,6 +15,9 @@ import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
 
+import 'package:mrpos/features/menu/data/repositories/firestore_menu_repository.dart';
+import 'package:mrpos/features/orders/data/repositories/orders_repository.dart';
+
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
 
@@ -22,7 +25,10 @@ class ReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ReportsCubit(
-        repository: ReportsRepository(),
+        repository: ReportsRepository(
+          OrdersRepository(),
+          FirestoreMenuRepository(),
+        ),
         exportService: ExcelExportService(),
       )..loadReport(),
       child: const _ReportsScreenContent(),
@@ -294,7 +300,7 @@ class _ReportsScreenContent extends StatelessWidget {
         ),
       ),
       child: Text(
-        responsive.isMobile ? 'Export' : 'Generate Report',
+        responsive.isMobile ? 'Export' : 'Export Report',
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
     );

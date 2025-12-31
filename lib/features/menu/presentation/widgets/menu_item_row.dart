@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 
@@ -74,23 +74,23 @@ class _MenuItemRowState extends State<MenuItemRow> {
             // Product Image & Info
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                widget.item.image,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: AppColors.grey.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(8),
+              child: widget.item.image.startsWith('http')
+                  ? Image.network(
+                      widget.item.image,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPlaceholder(),
+                    )
+                  : Image.asset(
+                      widget.item.image,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPlaceholder(),
                     ),
-                    child: const Icon(Icons.restaurant, size: 28),
-                  );
-                },
-              ),
             ),
             16.w,
             Expanded(
@@ -227,6 +227,18 @@ class _MenuItemRowState extends State<MenuItemRow> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: AppColors.grey.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(Icons.restaurant, size: 28),
     );
   }
 }

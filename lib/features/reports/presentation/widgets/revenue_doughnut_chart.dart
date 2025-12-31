@@ -14,17 +14,17 @@ class RevenueDoughnutChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final statusLabels = {
-      OrderStatus.completed: 'Confirmed',
-      OrderStatus.ready: 'Awaited',
+      OrderStatus.confirmed: 'Confirmed',
+      OrderStatus.awaited: 'Awaited',
       OrderStatus.cancelled: 'Cancelled',
-      OrderStatus.inProcess: 'Failed',
+      OrderStatus.failed: 'Failed',
     };
 
     final statusColors = {
-      OrderStatus.completed: AppColors.primaryRed,
-      OrderStatus.ready: AppColors.primaryRed.withValues(alpha: 0.7),
+      OrderStatus.confirmed: AppColors.primaryRed,
+      OrderStatus.awaited: AppColors.primaryRed.withValues(alpha: 0.7),
       OrderStatus.cancelled: AppColors.primaryRed.withValues(alpha: 0.4),
-      OrderStatus.inProcess: AppColors.primaryRed.withValues(alpha: 0.2),
+      OrderStatus.failed: AppColors.primaryRed.withValues(alpha: 0.2),
     };
 
     return Container(
@@ -95,7 +95,7 @@ class RevenueDoughnutChart extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${data.totalRevenue.toInt()}\$',
+                                '${data.totalOrdersRevenue.toInt()}\$',
                                 style: TextStyle(
                                   color: isDark ? Colors.white : Colors.black,
                                   fontSize: isSmall ? 24 : 32,

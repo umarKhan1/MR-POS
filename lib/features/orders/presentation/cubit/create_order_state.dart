@@ -36,11 +36,13 @@ class CreateOrderInitial extends CreateOrderState {
   final List<CartItem> cartItems;
   final double tax;
   final double charges;
+  final Order? editingOrder;
 
   const CreateOrderInitial({
     this.cartItems = const [],
     this.tax = 0.0,
-    this.charges = 0.0, // Changed from 24.0 to 0.0
+    this.charges = 0.0,
+    this.editingOrder,
   });
 
   double get subtotal => cartItems.fold(0, (sum, item) => sum + item.total);
@@ -51,11 +53,16 @@ class CreateOrderInitial extends CreateOrderState {
     List<CartItem>? cartItems,
     double? tax,
     double? charges,
+    Order? editingOrder,
+    bool clearEditingOrder = false,
   }) {
     return CreateOrderInitial(
       cartItems: cartItems ?? this.cartItems,
       tax: tax ?? this.tax,
       charges: charges ?? this.charges,
+      editingOrder: clearEditingOrder
+          ? null
+          : (editingOrder ?? this.editingOrder),
     );
   }
 }

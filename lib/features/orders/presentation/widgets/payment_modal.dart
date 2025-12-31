@@ -110,8 +110,8 @@ class _PaymentModalState extends State<PaymentModal> {
     if (mounted) {
       context.read<OrdersCubit>().updateOrderStatus(
         widget.order.id,
-        OrderStatus.completed,
-        'Delivered',
+        OrderStatus.confirmed,
+        'Confirmed',
       );
 
       // Close payment modal

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
-import 'package:mrpos/core/constants/menu_type.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
 import 'package:mrpos/features/menu/presentation/cubit/menu_state.dart';
 import 'package:mrpos/features/menu/presentation/widgets/add_menu_item_modal.dart';
@@ -14,8 +13,6 @@ class MenuTabs extends StatelessWidget {
   const MenuTabs({super.key});
 
   void _showAddMenuTypeModal(BuildContext context) {
-    final cubit = context.read<MenuCubit>();
-
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -34,16 +31,10 @@ class MenuTabs extends StatelessWidget {
           child: child,
         );
       },
-    ).then((result) {
-      if (result == true) {
-        cubit.refresh();
-      }
-    });
+    );
   }
 
   void _showEditMenuTypeModal(BuildContext context, MenuType menuType) {
-    final cubit = context.read<MenuCubit>();
-
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -62,11 +53,7 @@ class MenuTabs extends StatelessWidget {
           child: child,
         );
       },
-    ).then((result) {
-      if (result == true) {
-        cubit.refresh();
-      }
-    });
+    );
   }
 
   void _showDeleteConfirmation(BuildContext context, MenuType menuType) {
@@ -75,7 +62,7 @@ class MenuTabs extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         title: Text(
           'Delete Menu Type',
@@ -95,7 +82,7 @@ class MenuTabs extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(
@@ -107,22 +94,10 @@ class MenuTabs extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // Delete the menu type
-              MenuMockData.menuTypes.removeWhere(
-                (type) => type.id == menuType.id,
-              );
+              // Delete the menu type from Firestore
+              cubit.deleteMenuType(menuType.id);
 
-              // If this was the selected menu type, switch to the first one
-              final state = cubit.state;
-              if (state is MenuLoaded &&
-                  state.selectedMenuType == menuType.name) {
-                if (MenuMockData.menuTypes.isNotEmpty) {
-                  cubit.selectMenuType(MenuMockData.menuTypes.first.name);
-                }
-              }
-
-              cubit.refresh();
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -146,8 +121,7 @@ class MenuTabs extends StatelessWidget {
       builder: (context, state) {
         if (state is! MenuLoaded) return const SizedBox();
 
-        // Get menu types dynamically from mock data
-        final menuTypes = MenuMockData.menuTypes;
+        final menuTypes = state.menuTypes;
 
         return Wrap(
           spacing: 8,
@@ -160,6 +134,20 @@ class MenuTabs extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
+                // "All" tab
+                _MenuTypeTab(
+                  menuType: const MenuType(
+                    id: 'all',
+                    name: 'All',
+                    displayOrder: -1,
+                  ),
+                  isSelected: state.selectedMenuType == 'All',
+                  isDark: isDark,
+                  onTap: () => context.read<MenuCubit>().selectMenuType('All'),
+                  onEdit: null,
+                  onDelete: null,
+                ),
+
                 // Menu type tabs
                 ...menuTypes.map((menuType) {
                   final isSelected = state.selectedMenuType == menuType.name;
@@ -185,9 +173,6 @@ class MenuTabs extends StatelessWidget {
             CustomButton.primary(
               text: 'Add Menu Item',
               onPressed: () {
-                // Capture the cubit BEFORE showing the dialog
-                final cubit = context.read<MenuCubit>();
-
                 showGeneralDialog(
                   context: context,
                   barrierDismissible: true,
@@ -195,12 +180,7 @@ class MenuTabs extends StatelessWidget {
                   barrierColor: Colors.black54,
                   transitionDuration: const Duration(milliseconds: 300),
                   pageBuilder: (context, animation, secondaryAnimation) {
-                    return AddMenuItemModal(
-                      onSaved: () {
-                        // Use the captured cubit reference
-                        cubit.refresh();
-                      },
-                    );
+                    return const AddMenuItemModal();
                   },
                   transitionBuilder:
                       (context, animation, secondaryAnimation, child) {
@@ -235,8 +215,8 @@ class _MenuTypeTab extends StatefulWidget {
   final bool isSelected;
   final bool isDark;
   final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const _MenuTypeTab({
     required this.menuType,
@@ -309,28 +289,32 @@ class _MenuTypeTabState extends State<_MenuTypeTab> {
                       : FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 8),
+              if (widget.onEdit != null || widget.onDelete != null)
+                const SizedBox(width: 8),
               // Edit icon
-              _TabIconButton(
-                icon: Icons.edit,
-                onTap: widget.onEdit,
-                color: widget.isSelected
-                    ? Colors.white.withOpacity(0.9)
-                    : (widget.isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight),
-              ),
-              const SizedBox(width: 4),
+              if (widget.onEdit != null)
+                _TabIconButton(
+                  icon: Icons.edit,
+                  onTap: widget.onEdit!,
+                  color: widget.isSelected
+                      ? Colors.white.withOpacity(0.9)
+                      : (widget.isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondaryLight),
+                ),
+              if (widget.onEdit != null && widget.onDelete != null)
+                const SizedBox(width: 4),
               // Delete icon
-              _TabIconButton(
-                icon: Icons.close,
-                onTap: widget.onDelete,
-                color: widget.isSelected
-                    ? Colors.white.withOpacity(0.9)
-                    : (widget.isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight),
-              ),
+              if (widget.onDelete != null)
+                _TabIconButton(
+                  icon: Icons.close,
+                  onTap: widget.onDelete!,
+                  color: widget.isSelected
+                      ? Colors.white.withOpacity(0.9)
+                      : (widget.isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondaryLight),
+                ),
             ],
           ),
         ),

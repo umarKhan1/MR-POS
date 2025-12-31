@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_cubit.dart';
+import 'package:mrpos/features/menu/presentation/cubit/menu_state.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_cubit.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_state.dart';
 import 'package:mrpos/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
 
 class OrderCartSidebar extends StatefulWidget {
   final VoidCallback? onClose; // Optional close callback for mobile/tablet
@@ -171,29 +174,39 @@ class _OrderCartSidebarState extends State<OrderCartSidebar> {
                   20.h,
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: currentState.cartItems.isEmpty
-                          ? null
-                          : () {
-                              context.read<CreateOrderCubit>().placeOrder(
-                                _customerNameController.text,
-                              );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryRed,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Place Order',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                    child: BlocBuilder<MenuCubit, MenuState>(
+                      builder: (context, menuState) {
+                        final menuItems = menuState is MenuLoaded
+                            ? menuState.menuItems
+                            : <MenuItem>[];
+                        return ElevatedButton(
+                          onPressed:
+                              currentState.cartItems.isEmpty ||
+                                  menuState is! MenuLoaded
+                              ? null
+                              : () {
+                                  context.read<CreateOrderCubit>().placeOrder(
+                                    _customerNameController.text,
+                                    menuItems,
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryRed,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Place Order',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -237,96 +250,122 @@ class _CartItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Image
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.restaurant,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+    return BlocBuilder<MenuCubit, MenuState>(
+      builder: (context, menuState) {
+        final menuItems = menuState is MenuLoaded
+            ? menuState.menuItems
+            : <MenuItem>[];
+        final menuItem = menuItems.firstWhere(
+          (m) => m.id == item.menuItemId,
+          orElse: () => MenuItem(
+            id: item.menuItemId,
+            name: item.name,
+            description: '',
+            itemId: '',
+            image: '',
+            quantity: 0,
+            stockStatus: '',
+            isPerishable: false,
+            category: '',
+            price: item.price,
+            costPrice: 0,
+            isAvailable: true,
+            menuType: '',
+          ),
+        );
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
             ),
           ),
-          12.w,
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                4.h,
-                Text(
-                  '\$${item.price.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryRed,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Quantity controls
-          Row(
+          child: Row(
             children: [
-              _buildQuantityButton(
-                context,
-                icon: Icons.remove,
-                onPressed: () {
-                  context.read<CreateOrderCubit>().updateQuantity(
-                    item.menuItemId,
-                    item.quantity - 1,
-                  );
-                },
-              ),
-              12.w,
-              Text(
-                item.quantity.toString(),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black87,
+              // Image
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.restaurant,
+                  color: isDark ? Colors.grey[600] : Colors.grey[400],
                 ),
               ),
               12.w,
-              _buildQuantityButton(
-                context,
-                icon: Icons.add,
-                onPressed: () {
-                  context.read<CreateOrderCubit>().updateQuantity(
-                    item.menuItemId,
-                    item.quantity + 1,
-                  );
-                },
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    4.h,
+                    Text(
+                      '\$${item.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryRed,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Quantity controls
+              Row(
+                children: [
+                  _buildQuantityButton(
+                    context,
+                    icon: Icons.remove,
+                    onPressed: () {
+                      context.read<CreateOrderCubit>().updateQuantity(
+                        menuItem,
+                        item.quantity - 1,
+                      );
+                    },
+                  ),
+                  12.w,
+                  Text(
+                    item.quantity.toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  12.w,
+                  _buildQuantityButton(
+                    context,
+                    icon: Icons.add,
+                    onPressed: () {
+                      context.read<CreateOrderCubit>().updateQuantity(
+                        menuItem,
+                        item.quantity + 1,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

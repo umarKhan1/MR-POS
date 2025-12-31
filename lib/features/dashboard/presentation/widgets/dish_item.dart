@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mrpos/core/constants/app_constants.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
+import 'package:mrpos/features/dashboard/presentation/cubit/dashboard_state.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
 import 'package:mrpos/shared/utils/extensions.dart';
 import 'package:mrpos/shared/utils/responsive_utils.dart';
@@ -37,28 +37,19 @@ class DishItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              dish.image,
-              width: imageSize,
-              height: imageSize,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: imageSize,
-                  height: imageSize,
-                  decoration: BoxDecoration(
-                    color: AppColors.grey.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.restaurant,
-                    color: AppColors.grey,
-                    size: imageSize * 0.5,
-                  ),
-                );
-              },
+          Container(
+            width: imageSize,
+            height: imageSize,
+            decoration: BoxDecoration(
+              color: dish.inStock
+                  ? AppColors.primaryRed.withValues(alpha: 0.1)
+                  : AppColors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              _getCategoryIcon(dish.category),
+              color: dish.inStock ? AppColors.primaryRed : AppColors.grey,
+              size: imageSize * 0.6,
             ),
           ),
           responsive.isMobile ? 8.w : 12.w,
@@ -132,5 +123,19 @@ class DishItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String? category) {
+    if (category == null) return Icons.restaurant;
+    final cat = category.toLowerCase();
+    if (cat.contains('pizza')) return Icons.local_pizza;
+    if (cat.contains('burger')) return Icons.lunch_dining;
+    if (cat.contains('chicken')) return Icons.kebab_dining;
+    if (cat.contains('seafood') || cat.contains('fish')) return Icons.flatware;
+    if (cat.contains('desert') || cat.contains('sweet'))
+      return Icons.bakery_dining;
+    if (cat.contains('drink') || cat.contains('beverage'))
+      return Icons.local_drink;
+    return Icons.restaurant;
   }
 }

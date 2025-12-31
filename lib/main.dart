@@ -5,8 +5,12 @@ import 'package:mrpos/core/di/app_providers.dart';
 import 'package:mrpos/core/router/app_router.dart';
 import 'package:mrpos/shared/theme/app_theme.dart';
 import 'package:mrpos/shared/theme/theme_cubit.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 

@@ -1,20 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mrpos/core/constants/mock_data.dart';
-import 'package:mrpos/core/constants/orders_mock_data.dart';
+import 'package:mrpos/features/menu/domain/models/menu_models.dart';
+import 'package:mrpos/features/menu/domain/repositories/menu_repository.dart';
 import 'package:mrpos/core/models/order.dart';
+import 'package:mrpos/features/orders/domain/repositories/orders_repository.dart';
 import 'package:mrpos/features/orders/presentation/cubit/create_order_state.dart';
 
 class CreateOrderCubit extends Cubit<CreateOrderState> {
-  CreateOrderCubit() : super(const CreateOrderInitial());
+  final IOrdersRepository _ordersRepository;
+  final MenuRepository _menuRepository;
 
-  void loadOrderForEdit(String? orderId) {
-    if (orderId == null) return;
+  CreateOrderCubit({
+    required IOrdersRepository ordersRepository,
+    required MenuRepository menuRepository,
+  }) : _ordersRepository = ordersRepository,
+       _menuRepository = menuRepository,
+       super(const CreateOrderInitial());
 
-    // Find the order
-    final order = OrdersMockData.orders.firstWhere(
-      (o) => o.id == orderId,
-      orElse: () => OrdersMockData.orders.first,
-    );
+  void loadOrderForEdit(Order? order) {
+    if (order == null) return;
 
     // Convert order items to cart items
     final cartItems = order.items.map((item) {
@@ -23,16 +26,17 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        image: '', // Will be filled from menu data if needed
+        image: '', // Image isn't strictly needed for cart operations
       );
     }).toList();
 
-    // Load into cart with order's tax and charges
+    // Load into cart with order's tax and charges and store the source order
     emit(
       CreateOrderInitial(
         cartItems: cartItems,
         tax: order.tax,
         charges: order.charges,
+        editingOrder: order,
       ),
     );
   }
@@ -104,19 +108,13 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
     }
   }
 
-  void updateQuantity(String menuItemId, int quantity) {
+  void updateQuantity(MenuItem menuItem, int quantity) {
     if (state is CreateOrderInitial) {
       final currentState = state as CreateOrderInitial;
       if (quantity <= 0) {
-        removeItem(menuItemId);
+        removeItem(menuItem.id);
         return;
       }
-
-      // Find the menu item to check stock
-      final menuItem = MenuMockData.menuItems.firstWhere(
-        (item) => item.id == menuItemId,
-        orElse: () => MenuMockData.menuItems.first,
-      );
 
       // Check if requested quantity exceeds available stock
       if (quantity > menuItem.quantity) {
@@ -133,7 +131,7 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
       }
 
       final updatedCart = currentState.cartItems.map((item) {
-        if (item.menuItemId == menuItemId) {
+        if (item.menuItemId == menuItem.id) {
           return item.copyWith(quantity: quantity);
         }
         return item;
@@ -147,7 +145,10 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
     emit(const CreateOrderInitial());
   }
 
-  void placeOrder(String customerName) {
+  Future<void> placeOrder(
+    String customerName,
+    List<MenuItem> currentMenuItems,
+  ) async {
     if (state is CreateOrderInitial) {
       final currentState = state as CreateOrderInitial;
       if (currentState.cartItems.isEmpty) {
@@ -158,14 +159,30 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
       emit(const CreateOrderLoading());
 
       try {
-        // Create order
+        final isEditing = currentState.editingOrder != null;
+
+        // 1. Create/Update order object
+        final orderId = isEditing
+            ? currentState.editingOrder!.id
+            : 'order_${DateTime.now().millisecondsSinceEpoch}';
+
         final order = Order(
-          id: 'order_${DateTime.now().millisecondsSinceEpoch}',
-          orderNumber: '#${990 + OrdersMockData.orders.length + 1}',
-          customerName: customerName,
-          orderDate: DateTime.now(),
-          status: OrderStatus.inProcess,
-          statusDetail: 'Cooking Now',
+          id: orderId,
+          orderNumber: isEditing
+              ? currentState.editingOrder!.orderNumber
+              : '', // Suffix logic can be here
+          customerName: customerName.isEmpty
+              ? 'Walk-in Customer'
+              : customerName,
+          orderDate: isEditing
+              ? currentState.editingOrder!.orderDate
+              : DateTime.now(),
+          status: isEditing
+              ? currentState.editingOrder!.status
+              : OrderStatus.awaited,
+          statusDetail: isEditing
+              ? currentState.editingOrder!.statusDetail
+              : 'Awaited',
           items: currentState.cartItems
               .map(
                 (item) => OrderItem(
@@ -180,42 +197,52 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
           charges: currentState.charges,
         );
 
-        // Add to orders
-        OrdersMockData.orders.insert(0, order);
+        // 2. Persist to Firestore
+        if (isEditing) {
+          await _ordersRepository.updateOrder(order);
 
-        // Decrease stock for each item
-        for (final cartItem in currentState.cartItems) {
-          final menuItemIndex = MenuMockData.menuItems.indexWhere(
-            (item) => item.id == cartItem.menuItemId,
-          );
+          // 3. Handle stock adjustments for EDITS
+          final oldOrder = currentState.editingOrder!;
 
-          if (menuItemIndex != -1) {
-            final menuItem = MenuMockData.menuItems[menuItemIndex];
-            final newQuantity = menuItem.quantity - cartItem.quantity;
+          // Restore ALL stock from the old order first to simplify logic
+          for (final oldItem in oldOrder.items) {
+            try {
+              final menuItem = currentMenuItems.firstWhere(
+                (m) => m.id == oldItem.menuItemId,
+              );
+              await _menuRepository.updateMenuItem(
+                menuItem.copyWith(
+                  quantity: menuItem.quantity + oldItem.quantity,
+                ),
+              );
 
-            // Update quantity and status
-            String newStatus = 'instock';
-            if (newQuantity <= 0) {
-              newStatus = 'outofstock';
-            } else if (newQuantity <= 10) {
-              newStatus = 'lowstock';
+              // Update our local reference of stock to reflect this restoration
+              final index = currentMenuItems.indexOf(menuItem);
+              currentMenuItems[index] = menuItem.copyWith(
+                quantity: menuItem.quantity + oldItem.quantity,
+              );
+            } catch (e) {
+              // Item might have been deleted from menu, skip
             }
+          }
+        } else {
+          await _ordersRepository.addOrder(order);
+        }
 
-            MenuMockData.menuItems[menuItemIndex] = MenuItem(
-              id: menuItem.id,
-              name: menuItem.name,
-              description: menuItem.description,
-              itemId: menuItem.itemId,
-              image: menuItem.image,
-              quantity: newQuantity > 0 ? newQuantity : 0,
-              stockStatus: newStatus,
-              isPerishable: menuItem.isPerishable,
-              category: menuItem.category,
-              price: menuItem.price,
-              costPrice: menuItem.costPrice,
-              isAvailable: newQuantity > 0,
-              menuType: menuItem.menuType,
+        // 4. Decrease stock for the NEW/CURRENT quantities
+        for (final cartItem in currentState.cartItems) {
+          try {
+            final menuItem = currentMenuItems.firstWhere(
+              (m) => m.id == cartItem.menuItemId,
             );
+
+            await _menuRepository.updateMenuItem(
+              menuItem.copyWith(
+                quantity: menuItem.quantity - cartItem.quantity,
+              ),
+            );
+          } catch (e) {
+            // Item not found in currentMenuItems... should not happen but handle anyway
           }
         }
 

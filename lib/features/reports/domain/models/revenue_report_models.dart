@@ -25,15 +25,19 @@ class RevenueReportRecord {
 class RevenueReportData {
   final List<RevenueReportRecord> records;
   final Map<OrderStatus, double> revenueByStatus;
-  final List<MonthlyRevenue> monthlyTrend;
+  final List<MonthlyRevenue> monthlyTrend; // Default trend (Confirmed)
+  final Map<OrderStatus, List<MonthlyRevenue>> trendsByStatus;
+  final double totalOrdersRevenue; // Gross revenue including tax/charges
 
   RevenueReportData({
     required this.records,
     required this.revenueByStatus,
     required this.monthlyTrend,
+    required this.trendsByStatus,
+    required this.totalOrdersRevenue,
   });
 
-  double get totalRevenue =>
+  double get totalItemsRevenue =>
       records.fold(0, (sum, record) => sum + record.revenue);
   double get totalProfit =>
       records.fold(0, (sum, record) => sum + record.profit);

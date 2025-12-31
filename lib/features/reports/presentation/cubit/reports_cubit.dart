@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mrpos/core/services/excel_export_service.dart';
@@ -7,6 +8,8 @@ import 'package:mrpos/features/reports/presentation/cubit/reports_state.dart';
 class ReportsCubit extends Cubit<ReportsState> {
   final ReportsRepository _repository;
   final ExcelExportService _exportService;
+
+  StreamSubscription? _ordersSubscription;
 
   ReportsCubit({
     required ReportsRepository repository,
@@ -20,15 +23,31 @@ class ReportsCubit extends Cubit<ReportsState> {
                DateTime.now().year,
                DateTime.now().month,
                DateTime.now().day,
+               0,
+               0,
+               0,
              ),
              end: DateTime(
                DateTime.now().year,
                DateTime.now().month,
                DateTime.now().day,
+               23,
+               59,
+               59,
              ),
            ),
          ),
-       );
+       ) {
+    _initRealTimeUpdates();
+  }
+
+  void _initRealTimeUpdates() {
+    _ordersSubscription?.cancel();
+    _ordersSubscription = _repository.getOrdersStream().listen((_) {
+      // Re-load report when any order changes
+      loadReport();
+    });
+  }
 
   Future<void> loadReport({DateTimeRange? range}) async {
     final currentRange = range ?? _getCurrentRange();
@@ -37,13 +56,7 @@ class ReportsCubit extends Cubit<ReportsState> {
 
     try {
       final data = await _repository.getRevenueReport(currentRange);
-
-      if (data.records.isEmpty) {
-        emit(ReportsLoaded(data: data, dateRange: currentRange));
-        // Error state will be handled by UI showing snackbar or empty state
-      } else {
-        emit(ReportsLoaded(data: data, dateRange: currentRange));
-      }
+      emit(ReportsLoaded(data: data, dateRange: currentRange));
     } catch (e) {
       emit(ReportsError(e.toString(), dateRange: currentRange));
     }
@@ -54,22 +67,20 @@ class ReportsCubit extends Cubit<ReportsState> {
     if (state is ReportsLoading) return (state as ReportsLoading).dateRange;
     if (state is ReportsLoaded) return (state as ReportsLoaded).dateRange;
     if (state is ReportsError) return (state as ReportsError).dateRange;
+
+    final now = DateTime.now();
     return DateTimeRange(
-      start: DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-      ),
-      end: DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-      ),
+      start: DateTime(now.year, now.month, now.day, 0, 0, 0),
+      end: DateTime(now.year, now.month, now.day, 23, 59, 59),
     );
   }
 
   void updateDateRange(DateTimeRange range) {
     loadReport(range: range);
+  }
+
+  void refresh() {
+    loadReport();
   }
 
   Future<void> exportToExcel() async {

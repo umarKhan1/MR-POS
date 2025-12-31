@@ -24,12 +24,12 @@ class OrdersLoaded extends OrdersState {
   });
 
   int get totalOrders => orders.length;
-  int get readyCount =>
-      orders.where((o) => o.status == OrderStatus.ready).length;
-  int get inProcessCount =>
-      orders.where((o) => o.status == OrderStatus.inProcess).length;
-  int get completedCount =>
-      orders.where((o) => o.status == OrderStatus.completed).length;
+  int get confirmedCount =>
+      orders.where((o) => o.status == OrderStatus.confirmed).length;
+  int get awaitedCount =>
+      orders.where((o) => o.status == OrderStatus.awaited).length;
+  int get failedCount =>
+      orders.where((o) => o.status == OrderStatus.failed).length;
   int get cancelledCount =>
       orders.where((o) => o.status == OrderStatus.cancelled).length;
 

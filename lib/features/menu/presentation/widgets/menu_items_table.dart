@@ -5,6 +5,8 @@ import 'package:mrpos/features/menu/presentation/cubit/menu_state.dart';
 import 'package:mrpos/features/menu/presentation/widgets/menu_item_row.dart';
 import 'package:mrpos/features/menu/presentation/widgets/menu_table_header.dart';
 import 'package:mrpos/shared/theme/app_colors.dart';
+import 'package:mrpos/features/menu/presentation/widgets/menu_shimmer.dart';
+import 'package:mrpos/features/menu/presentation/widgets/menu_empty_state.dart';
 
 /// Widget that displays menu items in a table layout (for desktop)
 class MenuItemsTable extends StatelessWidget {
@@ -23,7 +25,34 @@ class MenuItemsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MenuCubit, MenuState>(
       builder: (context, state) {
+        if (state is MenuLoading) {
+          return MenuShimmer(isTable: true, isDark: isDark);
+        }
+
         if (state is! MenuLoaded) return const SizedBox();
+
+        // Filter items by menu type and category
+        final selectedCategory = state.categories
+            .where((c) => c.id == state.selectedCategoryId)
+            .firstOrNull;
+
+        final filteredItems = state.menuItems.where((item) {
+          final matchesMenuType =
+              state.selectedMenuType == 'All' ||
+              item.menuType == state.selectedMenuType;
+          final matchesCategory =
+              state.selectedCategoryId == '1' ||
+              (selectedCategory != null &&
+                  item.category == selectedCategory.name);
+          return matchesMenuType && matchesCategory;
+        }).toList();
+
+        if (filteredItems.isEmpty) {
+          return const MenuEmptyState(
+            title: 'No Menu Items',
+            message: 'No items found for this menu type. Add your first item!',
+          );
+        }
 
         return Container(
           decoration: BoxDecoration(
@@ -41,8 +70,7 @@ class MenuItemsTable extends StatelessWidget {
             children: [
               MenuTableHeader(isDark: isDark),
               // Table Rows
-              ...state.menuItems
-                  .where((item) => item.menuType == state.selectedMenuType)
+              ...filteredItems
                   .map(
                     (item) => MenuItemRow(
                       item: item,
