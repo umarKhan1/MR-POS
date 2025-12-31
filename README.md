@@ -170,5 +170,15 @@ To use real Firebase Authentication:
 
 ---
 
+## Author
+
+Developed with ❤️ by **Muhammad Omar**.
+
+Connect with me:
+- [LinkedIn](https://www.linkedin.com/in/muhammad-omar-0335/)
+- [GitHub Profile](https://github.com/umarKhan1)
+
+---
+
 ## License
 Internal / Open Source. See `LICENSE` for more details.
